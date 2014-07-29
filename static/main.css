@@ -28,6 +28,7 @@ html, body {
 
 #messages {
 	float: left;
+	overflow-y: scroll;
 	width: 75%;
 	height: 90%;
 	background: #fff;

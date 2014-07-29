@@ -2,19 +2,24 @@
 	<head>
 		<title>{{ title }}</title>
 		<link rel="stylesheet" href="{{ static_url("main.css") }}" type="text/css"/>
+		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="{{ static_url("main.js") }}"></script>
 	</head>
 	<body>
 		<div id="chat">
 			<div id="messages">
-				
+				{% for x in messages %}
+					{{ x }}<br>
+				{% end %}
+
 			</div>
 			<div id="chatters">
 				<a id="logout" href="/logout">logout</a>
 				<div id="welcome_msg">Hello {{ username }}, you are logged in!</div>
 			</div>
 			<div id="message_input">
-				<form>
-					<input type="text" name="message">
+				<form action="/"  method="POST">
+					<input id="chat_input" type="text" name="message" autocomplete="off">
 					<input type="submit" value="submit">
 				</form>
 			</div>
