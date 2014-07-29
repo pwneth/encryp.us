@@ -5,12 +5,15 @@
 	</head>
 	<body>
 		<div id="login_form">
-			{% if error %}
-			{{ error }}
-			{% end %}
+			<div id="errors">
+				{% if error %}
+				{{ error }}
+				{% end %}
+			</div>
 			<form action="/login" method="POST">
 				<input type="text" name="username">
 				<input type="password" name="password">
+				<input type="hidden" name="next_page" value="{{ next_page }}">
 				<input type="submit" value="submit">
 			</form>
 		</div>

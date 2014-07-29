@@ -38,7 +38,17 @@ class MainHandler(BaseHandler):
 		# if not self.current_user:
 		# 	self.redirect("/login")
 		# 	return
-		self.render("home.html", title="Home Page", username=self.current_user)
+		self.render("home.html", title="Home Page", 
+			username=self.current_user)
+
+class AccountHandler(BaseHandler):
+	@tornado.web.authenticated
+	def get(self):
+		# if not self.current_user:
+		# 	self.redirect("/login")
+		# 	return
+		self.render("account.html", title="Account Page", 
+			username=self.current_user)
 
 	# def post(self):
 	# 	page_url = self.request.full_url()
@@ -58,19 +68,24 @@ class ChatHandler(BaseHandler):
 
 class LoginHandler(BaseHandler):
 	def get(self):
+		next_page = self.get_argument("next", default="/")
+
 		if self.current_user:
-			self.redirect("/")
+			self.redirect(next_page)
 		else:
-			self.render("login.html", title="Login Page", error=None)
+			self.render("login.html", title="Login Page", 
+				error=None, next_page=next_page)
 
 	def post(self):
 		get_pw = self.get_argument("password")
 		get_un = self.get_argument("username")
+		next_page = self.get_argument("next_page", default="/")
 		if get_un in allowed_users and allowed_users[get_un] == get_pw:
 			self.set_secure_cookie("user", get_un)
-			self.redirect("/")
+			self.redirect(next_page)
 		else:
-			self.render("login.html", title="Login Page", error="username or pw wrong")
+			self.render("login.html", title="Login Page", 
+				error="username or pw wrong", next_page=next_page)
 
 class LogoutHandler(BaseHandler):
 	def get(self):
@@ -82,6 +97,7 @@ def make_app():
     app = Application([
         url(r"/", MainHandler),
         url(r"/chat", ChatHandler),
+        url(r"/account", AccountHandler),
         url(r"/login", LoginHandler),
         url(r"/logout", LogoutHandler)
         ], 

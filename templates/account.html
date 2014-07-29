@@ -1,0 +1,13 @@
+<html>
+	<head>
+		<title>{{ title }}</title>
+		<link rel="stylesheet" href="{{ static_url("main.css") }}" type="text/css"/>
+	</head>
+	<body>
+		Change user name:
+		<form>
+			<input type="text" name="message" value="{{ username }}">
+			<input type="submit" value="submit">
+		</form>
+	</body>
+</html>
