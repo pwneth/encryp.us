@@ -8,10 +8,19 @@
 	<body>
 		<div id="chat">
 			<div id="messages">
-				{% for x in messages %}
-					{{ x }}<br>
+				{% for msg in messages['messages'] %}
+					<div class="message">
+						<div class="name">
+							{{ msg['name'] }}&nbsp;:&nbsp;
+						</div>
+						<div class="msg">
+							{{ msg['message'] }}
+						</div>
+						<div class="time">
+							@ {{ msg['time'] }}
+						</div>
+					</div>
 				{% end %}
-
 			</div>
 			<div id="chatters">
 				<a id="logout" href="/logout">logout</a>

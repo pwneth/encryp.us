@@ -35,6 +35,35 @@ html, body {
 	font-family: 'Roboto Slab', serif;
 }
 
+.message {
+	padding: 5px;
+	height: 20px;
+	border-bottom: 1px solid #eee;
+}
+
+.message:nth-child(even){
+	background-color: #eee;
+}
+
+.name {
+	font-weight: bold;
+	float: left;
+	display: inline-block;
+}
+
+.msg {
+	float: left;
+	display: inline-block;
+}
+
+.time {
+	color: #ccc;
+	float: right;
+	display: inline-block;
+}
+
+
+
 #chatters {
 	font-family: 'Roboto Slab', serif;
 	padding: 50px 25px;

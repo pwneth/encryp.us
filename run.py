@@ -4,17 +4,17 @@ from tornado.web import RequestHandler, Application, url
 import tornado.httputil
 import base64
 import json
+from datetime import datetime, date
 
 #this is temporary -- will take users from a JSON db later on
 #will also allow for user/pw creation by admin
 allowed_users = {"michael":"password","admin":"whatever"}
 
-#this is also temportary -- posts to display
-
-
-
-
-posts = []
+#this defines a global function to reload the json data when needed
+def loadjson():
+		with open('templates/data.json') as f:
+			jsondata = json.load(f)
+		return jsondata
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -30,34 +30,29 @@ class MainHandler(BaseHandler):
 		# if not self.current_user:
 		# 	self.redirect("/login")
 		# 	return
-			# with open('templates/data.json') as f:
-			# 	data = f.read()
-			# 	jsondata = json.loads(data)
-
-			# print(jsondata)
+		print(loadjson())
 		self.render("home.html", title="Home Page", 
-			username=self.current_user, messages=posts)
+			username=self.current_user, messages=loadjson())
 
 	def post(self):
-		# msg = self.get_argument("message")
+		msg = self.get_argument("message")
+		time = datetime.now().strftime("%Y-%m-%d %H:%M")
+		
 		# new_message = {'name':self.current_user.decode("utf-8"),
 		# 	'message':msg,
 		# 	'time':'3:00pm'}
+		with open('templates/data.json') as f:
+			data = json.load(f)
 
-		# with open('templates/data.json') as f:
-		# 	data = json.load(f)
+		data['messages'].append({'name':self.current_user.decode("utf-8"),'message':msg,'time':time})
 
-		# data.update(new_message)
+		with open('templates/data.json', 'w') as f:
+			json.dump(data, f)
 
-		# with open('templates/data.json', 'w') as f:
-		# 	json.dump(data, f)
+		loadjson()
 
-		msg = self.get_argument("message")
-		posts.append(self.current_user.decode("utf-8") + ": " + msg)
 		self.render("home.html", title="Home Page", 
-			username=self.current_user, messages=posts)
-
-
+			username=self.current_user,	 messages=loadjson())
 
 
 class AccountHandler(BaseHandler):
