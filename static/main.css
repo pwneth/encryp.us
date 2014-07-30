@@ -28,11 +28,19 @@ html, body {
 
 #messages {
 	float: left;
-	overflow-y: scroll;
 	width: 75%;
 	height: 90%;
 	background: #fff;
 	font-family: 'Roboto Slab', serif;
+	position: relative;
+}
+
+#messages_inner {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	overflow-y:scroll;
 }
 
 .message {

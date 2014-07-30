@@ -8,28 +8,21 @@
 	<body>
 		<div id="chat">
 			<div id="messages">
-				{% for msg in messages['messages'] %}
-					<div class="message">
-						<div class="name">
-							{{ msg['name'] }}&nbsp;:&nbsp;
-						</div>
-						<div class="msg">
-							{{ msg['message'] }}
-						</div>
-						<div class="time">
-							@ {{ msg['time'] }}
-						</div>
-					</div>
-				{% end %}
+				<div id="messages_inner">
+					{% for msg in messages['messages'] %}
+						{% module Template("message.html", msg=msg) %}
+					{% end %}
+					<a id="whatever"></a>
+				</div>
 			</div>
 			<div id="chatters">
 				<a id="logout" href="/logout">logout</a>
 				<div id="welcome_msg">Hello {{ username }}, you are logged in!</div>
 			</div>
 			<div id="message_input">
-				<form action="/"  method="POST">
+				<form method="POST">
 					<input id="chat_input" type="text" name="message" autocomplete="off">
-					<input type="submit" value="submit">
+					<input id="chat_submit" type="submit" value="submit">
 				</form>
 			</div>
 		</div>

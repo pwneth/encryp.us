@@ -12,7 +12,7 @@ allowed_users = {"michael":"password","admin":"whatever"}
 
 #this defines a global function to reload the json data when needed
 def loadjson():
-		with open('templates/data.json') as f:
+		with open('static/data.json') as f:
 			jsondata = json.load(f)
 		return jsondata
 
@@ -41,18 +41,18 @@ class MainHandler(BaseHandler):
 		# new_message = {'name':self.current_user.decode("utf-8"),
 		# 	'message':msg,
 		# 	'time':'3:00pm'}
-		with open('templates/data.json') as f:
+		with open('static/data.json') as f:
 			data = json.load(f)
 
 		data['messages'].append({'name':self.current_user.decode("utf-8"),'message':msg,'time':time})
 
-		with open('templates/data.json', 'w') as f:
+		with open('static/data.json', 'w') as f:
 			json.dump(data, f)
 
 		loadjson()
 
-		self.render("home.html", title="Home Page", 
-			username=self.current_user,	 messages=loadjson())
+		# self.render("home.html", title="Home Page", 
+		# 	username=self.current_user,	 messages=loadjson())
 
 
 class AccountHandler(BaseHandler):
