@@ -1,18 +1,43 @@
 $(document).ready(function() {
 	$("#chat_input").focus();
 
+	(function($) {
+    $.fn.hasScrollBar = function() {
+        return this.get(0).scrollHeight > this.height();
+    }
+	})(jQuery);
+
+	if (!($("#messages").hasScrollBar())) {
+		$("#messages_inner").css({
+			top: "auto",
+			bottom: 0
+		});
+	}
+
+	var messageDiv = document.getElementById("messages");
+	messageDiv.scrollTop = messageDiv.scrollHeight;
+
 	$("#chat_submit").click(function() {
 		var message = $("#chat_input").val();
-		var submitted_string = "message=" + message;
-		$.ajax({
-            type: "POST",
-            url: "/",
-            data: submitted_string,
-            success: function(){
-                return "submitted to post!";}
-            });
-		$("#chat_input").val("");
-		return false;
+		if (message == "") {
+			$("#chat_submit").effect( "highlight", {color: 'red'}, 1000 );
+			$("#chat_submit").attr("value", "can't be empty");
+			return false;
+		} else {
+			var submitted_string = "message=" + message;
+			$.ajax({
+	            type: "POST",
+	            url: "/",
+	            data: submitted_string,
+	            success: function(event){
+	            		event.stopPropagation();
+	                	$("#chat_submit").effect( "highlight", {color: '#53ED6A'}, 1000 );
+	            	}
+	            });
+			$("#chat_input").val("");
+			$("#chat_submit").attr("value", "submit");
+			return false;
+		}
 	});
 
 	// var d = $('#messages');
@@ -22,9 +47,21 @@ $(document).ready(function() {
 	// 	$("#messages").load("/ #messages_inner");
 	// });
 
-	// setInterval(function(){
-	// 	$("#messages").load("/ #messages_inner");
-	// }, 100);
+	function load_messages(){
+		$("#messages").load("/message #messages_inner", null, function() {
+			setTimeout(load_messages, 0);
+			if ($("#messages").hasScrollBar()) {
+				messageDiv.scrollTop = messageDiv.scrollHeight;
+			} else {
+				$("#messages_inner").css({
+					top: "auto",
+					bottom: 0
+				});
+			}
+		});
+	}
+
+	setTimeout(load_messages, 0);
 
 
 	//$("#messages").animate({ scrollTop: $("#whatever").scrollTop()}, 1000);

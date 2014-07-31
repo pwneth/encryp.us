@@ -4,6 +4,10 @@ html, body {
 	margin: 0;
 }
 
+highlight {
+	color: green;
+}
+
 #login_form {
 	margin-top: 100px;
 	text-align: center;
@@ -33,14 +37,14 @@ html, body {
 	background: #fff;
 	font-family: 'Roboto Slab', serif;
 	position: relative;
+	overflow-y:auto;
 }
 
 #messages_inner {
 	position: absolute;
-	bottom: 0;
+	top: 0;
 	right: 0;
 	left: 0;
-	overflow-y:scroll;
 }
 
 .message {

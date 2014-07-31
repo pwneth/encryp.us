@@ -1,5 +1,5 @@
-
 from tornado.ioloop import IOLoop
+from tornado.concurrent import Future
 from tornado.web import RequestHandler, Application, url
 import tornado.httputil
 import base64
@@ -9,6 +9,8 @@ from datetime import datetime, date
 #this is temporary -- will take users from a JSON db later on
 #will also allow for user/pw creation by admin
 allowed_users = {"michael":"password","admin":"whatever"}
+
+message_futures = []
 
 #this defines a global function to reload the json data when needed
 def loadjson():
@@ -22,14 +24,25 @@ class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         return self.get_secure_cookie("user")
 
+class MessageHandler(BaseHandler):
+	'''MessageHandler handles each message'''
+	@tornado.web.authenticated
+	@tornado.web.asynchronous
+	def get(self):
+		future = Future()
+		future.add_done_callback(self.render_now)
+		message_futures.append(future)
+
+	def render_now(self, future):
+		self.render("home.html", title="Home Page", 
+			username=self.current_user, messages=loadjson())
+		# self.finish()
+
 
 class MainHandler(BaseHandler):
 	'''MainHandler shows the chat application @ home.html'''
 	@tornado.web.authenticated
 	def get(self):
-		# if not self.current_user:
-		# 	self.redirect("/login")
-		# 	return
 		print(loadjson())
 		self.render("home.html", title="Home Page", 
 			username=self.current_user, messages=loadjson())
@@ -38,9 +51,6 @@ class MainHandler(BaseHandler):
 		msg = self.get_argument("message")
 		time = datetime.now().strftime("%Y-%m-%d %H:%M")
 		
-		# new_message = {'name':self.current_user.decode("utf-8"),
-		# 	'message':msg,
-		# 	'time':'3:00pm'}
 		with open('static/data.json') as f:
 			data = json.load(f)
 
@@ -51,8 +61,10 @@ class MainHandler(BaseHandler):
 
 		loadjson()
 
-		# self.render("home.html", title="Home Page", 
-		# 	username=self.current_user,	 messages=loadjson())
+		for f in message_futures:
+			f.set_result(None)
+
+		message_futures[:] = []
 
 
 class AccountHandler(BaseHandler):
@@ -98,6 +110,7 @@ def make_app():
     app = Application([
         url(r"/", MainHandler),
         url(r"/account", AccountHandler),
+        url(r"/message", MessageHandler),
         url(r"/login", LoginHandler),
         url(r"/logout", LogoutHandler)
         ], 
