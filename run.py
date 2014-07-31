@@ -8,7 +8,8 @@ from datetime import datetime, date
 
 #this is temporary -- will take users from a JSON db later on
 #will also allow for user/pw creation by admin
-allowed_users = {"michael":"password","admin":"whatever"}
+allowed_users = {"michael":"password","admin":"password","evilghost":"password",
+				"cooltortoise":"password"}
 
 message_futures = []
 

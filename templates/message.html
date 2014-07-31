@@ -1,9 +1,9 @@
 <div class="message">
 	<div class="name">
-		{{ msg['name'] }}&nbsp;:&nbsp;
+		{{ msg['name'] }}:&nbsp;
 	</div>
 	<div class="msg">
-		{{ msg['message'] }}
+		{{ linkify(msg['message']) }}
 	</div>
 	<div class="time">
 		@ {{ msg['time'] }}
