@@ -34,6 +34,7 @@ class MessageHandler(BaseHandler):
 		future.add_done_callback(self.render_now)
 		message_futures.append(future)
 
+
 	def render_now(self, future):
 		self.render("home.html", title="Home Page", 
 			username=self.current_user, messages=loadjson())
@@ -44,7 +45,6 @@ class MainHandler(BaseHandler):
 	'''MainHandler shows the chat application @ home.html'''
 	@tornado.web.authenticated
 	def get(self):
-		print(loadjson())
 		self.render("home.html", title="Home Page", 
 			username=self.current_user, messages=loadjson())
 
@@ -59,8 +59,6 @@ class MainHandler(BaseHandler):
 
 		with open('static/data.json', 'w') as f:
 			json.dump(data, f)
-
-		loadjson()
 
 		for f in message_futures:
 			f.set_result(None)

@@ -4,6 +4,8 @@ $(document).ready(function() {
 	function load_messages(){
 		$("#messages").load("/message #messages_inner", null, function() {
 			setTimeout(load_messages, 0);
+			$(".message:last-child").hide();
+			$(".message:last-child").fadeIn("slow");
 			if ($("#messages").hasScrollBar()) {
 				messageDiv.scrollTop = messageDiv.scrollHeight;
 			} else {
@@ -12,8 +14,6 @@ $(document).ready(function() {
 					bottom: 0
 				});
 			}
-			$(".message:last-child").hide();
-			$(".message:last-child").fadeIn("slow");
 		});
 	}
 
