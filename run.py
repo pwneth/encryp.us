@@ -9,7 +9,7 @@ from Crypto.Cipher import AES
 
 # temporary hardcodes AES key for encrypting messages -- will
 # use user generated key later on
-obj = AES.new("1qazxsw23edcvfr4")
+#obj = AES.new("1qazxsw23edcvfr4")
 
 # this is temporary -- will take users from a JSON db later on
 # will also allow for user/pw creation by admin
@@ -33,8 +33,9 @@ class decrypt_msg(object):
     def __init__(self, msg):
         self.name = msg['name']
         self.time = msg['time']
-        message = base64.b64decode(msg['message'])
-        self.msg = obj.decrypt(message).decode("utf-8")
+        self.msg = msg['message']
+        # message = base64.b64decode(msg['message'])
+        # self.msg = obj.decrypt(message).decode("utf-8")
 
 
 # loads json data and append decrypted information to an array and return
@@ -85,20 +86,20 @@ class MainHandler(BaseHandler):
         msg = self.get_argument("message")
 
         # make sure msg is 16 bits
-        if ((len(msg) % 16) != 0):
-            times = 16 - (len(msg) % 16)
-            for i in range(1, times + 1):
-                msg += " "
+        # if ((len(msg) % 16) != 0):
+        #     times = 16 - (len(msg) % 16)
+        #     for i in range(1, times + 1):
+        #         msg += " "
 
         # encrypt the message with b64 and utf-8 encoding
-        encrypted_msg = base64.b64encode(obj.encrypt(msg)).decode("utf-8")
+        # encrypted_msg = base64.b64encode(obj.encrypt(msg)).decode("utf-8")
         time = datetime.now().strftime("%Y-%m-%d %H:%M")
 
         with open('static/data.json') as f:
             data = json.load(f)
 
         data['messages'].append({'name': self.current_user.decode("utf-8"),
-                                 'message': encrypted_msg,
+                                 'message': msg, #encrypted_msg
                                  'time': time})
 
         with open('static/data.json', 'w') as f:

@@ -1,8 +1,19 @@
 $(document).ready(function() {
 	$("#chat_input").focus();
 
+	function decrypt_messages() {
+		$(".msg").each(function( index ) {
+			var encrypted_content = $(this).html().trim();
+			var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, "1234"));
+			console.log(encrypted_content);
+			$(this).text(decrypted_content);
+		});
+	}
+	decrypt_messages()
+
 	function load_messages(){
 		$("#messages").load("/message #messages_inner", null, function() {
+			decrypt_messages()
 			setTimeout(load_messages, 0);
 			$(".message:last-child").hide();
 			$(".message:last-child").fadeIn("slow");
@@ -42,7 +53,9 @@ $(document).ready(function() {
 			$("#chat_submit").attr("value", "can't be empty");
 			return false;
 		} else {
-			var submitted_string = "message=" + message;
+			var encrypted_message = CryptoJS.AES.encrypt(message, "1234");
+
+			var submitted_string = "message=" + encrypted_message;
 			$.ajax({
 	            type: "POST",
 	            url: "/",
