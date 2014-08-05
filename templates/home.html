@@ -10,7 +10,7 @@
 		<div id="chat">
 			<div id="messages">
 				<div id="messages_inner">
-					{% for msg in messages['messages'] %}
+					{% for msg in messages %}
 						{% module Template("message.html", msg=msg) %}
 					{% end %}
 				</div>
