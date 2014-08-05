@@ -4,6 +4,8 @@
 
 html, body {
 	margin: 0;
+	width: 100%;
+	height: 100%;
 }
 
 #login_title {
@@ -12,7 +14,7 @@ html, body {
 }
 
 #login_form {
-	margin-top: 100px;
+	padding-top: 100px;
 	text-align: center;
 	height: 5em;
 }
@@ -141,12 +143,20 @@ html, body {
 }
 
 /* FORM STYLES */
+#message_input form {
+	height: 100%;
+	width: 100%;
+}
+
 #message_input input[type="text"] {
 	float: left;
 	width: 75%;
 	margin-top: 0;
 	height: 100%;
 	font-family: 'Roboto Slab', serif;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
 #message_input input[type="submit"] {
@@ -156,9 +166,6 @@ html, body {
 	font-family: "Geo",sans-serif;
 	font-size: 25px;
 	border-left: 5px solid #ccc;
-	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
-	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
 
@@ -168,6 +175,7 @@ input[type="text"], input[type="password"] {
 	border: 0px;
 	background-color: #eee;
 	padding-left: 1em;
+	outline: none;
 	font-family: 'Roboto Slab', serif;
 }
 
