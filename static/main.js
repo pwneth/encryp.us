@@ -1,5 +1,9 @@
 $(document).ready(function() {
 
+	if ($("#chat_input")) {
+		$("#chat_input").focus();
+	}
+
 	var session_password = sessionStorage.getItem("session_password");
 
 	function decrypt_messages() {
@@ -25,7 +29,6 @@ $(document).ready(function() {
 	$("#login_submit").click(function() {
 		var password = $("#enc_key").val();
 		sessionStorage.setItem("session_password", password);
-		$("#enc_key").val("xxxxxx");
 		// if (password == "") {
 		// 	$("#aes_submit").effect( "highlight", {color: 'red'}, 1000 );
 		// 	$("#aes_submit").attr("value", "can't be empty");
