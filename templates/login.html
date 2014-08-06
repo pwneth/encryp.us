@@ -10,8 +10,9 @@
 				{% end %}
 			</div>
 			<form action="/login" method="POST">
-				<input type="text" name="username">
-				<input type="password" name="password">
+				<label for="username">Username: </label><input type="text" name="username" id="username">
+				<label for="password">Password: </label><input type="password" name="password" id="password">
+				<label for="enc_key">Encryption Key: </label><input type="password" name="enc_key" id="enc_key">
 				<input type="hidden" name="next_page" value="{{ next_page }}">
 				<input type="submit" value="submit">
 			</form>

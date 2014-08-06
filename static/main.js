@@ -1,16 +1,28 @@
 $(document).ready(function() {
 
-	$("#chat_input").focus();
+	var password = "";
 
 	function decrypt_messages() {
 		$(".msg").each(function( index ) {
 			var encrypted_content = $(this).html().trim();
-			var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, "1234"));
-			console.log(encrypted_content);
+			var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, password));
 			$(this).text(decrypted_content);
 		});
 	}
-	decrypt_messages()
+
+	$("#aes_submit").click(function() {
+		password = $("#aes_input").val();
+		if (password == "") {
+			$("#aes_submit").effect( "highlight", {color: 'red'}, 1000 );
+			$("#aes_submit").attr("value", "can't be empty");
+		} else {
+			$('#aes_password').hide();
+			$('#chat').show();
+			$("#chat_input").focus();
+			decrypt_messages();
+		}
+		return false;
+	});
 
 	function load_messages(){
 		$("#messages").load("/message #messages_inner", null, function() {
@@ -54,7 +66,7 @@ $(document).ready(function() {
 			$("#chat_submit").attr("value", "can't be empty");
 			return false;
 		} else {
-			var encrypted_message = CryptoJS.AES.encrypt(message, "1234");
+			var encrypted_message = CryptoJS.AES.encrypt(message, password);
 
 			$.ajax({
 	            type: "POST",
@@ -64,6 +76,9 @@ $(document).ready(function() {
 	                	$("#chat_submit").effect( "highlight", {color: '#53ED6A'}, 500 );
 						$("#chat_input").val("");
 						$("#chat_submit").attr("value", "submit");
+						$('#aes_password').hide();
+						$('#chat').show();
+						$("#chat_input").focus();
 	            	}
 	            });
 			return false;
