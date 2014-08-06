@@ -1,4 +1,5 @@
 $(document).ready(function() {
+
 	$("#chat_input").focus();
 
 	function decrypt_messages() {
@@ -55,11 +56,10 @@ $(document).ready(function() {
 		} else {
 			var encrypted_message = CryptoJS.AES.encrypt(message, "1234");
 
-			var submitted_string = "message=" + encrypted_message;
 			$.ajax({
 	            type: "POST",
 	            url: "/",
-	            data: submitted_string,
+	            data: {message: encrypted_message.toString()},
 	            success: function(){
 	                	$("#chat_submit").effect( "highlight", {color: '#53ED6A'}, 500 );
 						$("#chat_input").val("");
