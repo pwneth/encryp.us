@@ -6,6 +6,7 @@ import base64
 import json
 from datetime import datetime, date
 from Crypto.Cipher import AES
+import tornado.autoreload
 
 # temporary hardcodes AES key for encrypting messages -- will
 # use user generated key later on
@@ -168,6 +169,10 @@ def make_app():
         login_url="login",
         cookie_secret="ajfhafaj8r7w73d872")
     app.listen(8888)
+    tornado.autoreload.start()
+    tornado.autoreload.watch("static/main.js")
+    tornado.autoreload.watch("static/main.css")
+    tornado.autoreload.watch("templates/")
     IOLoop.current().start()
 
 

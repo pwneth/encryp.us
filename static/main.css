@@ -67,6 +67,16 @@ html, body {
 	height: 100%;
 }
 
+#reenter_key {
+	display: none;
+	background: rgba(0,0,0,.5);
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+}
+
 #messages {
 	float: left;
 	width: 75%;
@@ -118,7 +128,6 @@ html, body {
 
 #chatters {
 	font-family: 'Roboto Slab', serif;
-	padding: 50px 25px;
 	float: left;
 	width: 25%;
 	height: 90%;
@@ -130,19 +139,14 @@ html, body {
 	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-#welcome_msg {
-	font-family: "Geo",sans-serif;
-	font-size: 25px;
-	text-decoration: none;
+.menu_item {
+	width: 100%;
 	text-align: center;
-	position: absolute;
-	top: 30px;
-	left: -5px;
-	right: 0px;
-	height: 30px;
-	line-height: 30px;
-	background-color: #fff;
-	border-bottom: 5px solid #ccc;
+	line-height: 40px;
+}
+
+#welcome_msg {
+	background: #fff;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
@@ -156,22 +160,28 @@ html, body {
 }
 
 #logout {
-	font-family: "Geo",sans-serif;
-	font-size: 25px;
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	height: 30px;
-	line-height: 30px;
-	text-decoration: none;
-	text-align: center;
-	width: 100%;
-	color: #fff;
 	background-color: #E37C7B;
+}
+
+#logout a{
+	display: block;
+	color: #fff;
+	text-decoration: none;
 }
 
 #logout:hover {
 	background-color: #964342;
+}
+
+#re_enc {
+	margin-top: 15px;
+	background: #ccc;
+}
+
+#re_enc:hover {
+	cursor: pointer;
+	background: #DDAA62;
+	color: #fff;
 }
 
 /* FORM STYLES */
@@ -223,6 +233,38 @@ input[type="submit"]:hover {
 	cursor: pointer;
 	opacity: .8;
 }
+
+/* VEX STYLES */
+
+.vex-dialog-form {
+	font-family: 'Roboto Slab', serif;
+}
+
+.vex-dialog-message {
+    margin-bottom: 1em !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+}
+
+.vex-content {
+	border-radius: 0px !important;
+	border-top: 0px !important;
+	background-color: #fff !important;
+	padding: 50px !important;
+}
+
+.vex-content input[type="text"] {
+	background-color: #eee !important;
+	border-radius: 0px !important;
+	border: 0px !important;
+}
+
+.vex-content input[type="submit"], .vex-content input[type="button"] {
+	font-family: "Geo",sans-serif !important;
+	height: 3em !important;
+	font-size: 15px !important;
+}
+
 
 @media (max-width: 480px) {
 	#chatters {
