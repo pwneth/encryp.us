@@ -1,0 +1,6 @@
+Markdown==2.4.1
+certifi==14.05.14
+livereload==2.2.1
+pycrypto==2.6.1
+tornado==4.0
+torndb==0.2
