@@ -11,6 +11,16 @@
 			<div id="chatters">
 				<div id="logout" class="menu_item"><a href="/logout">logout</a></div>
 				<div id="welcome_msg" class="menu_item">Welcome, {{ username }}.</div>
+				<div id="add_user" class="menu_item">create new user</div>
+					<div id="add_user_form">
+						<form method="POST">
+							<label for="new_username">Username: </label>
+							<input id="new_username" type="text" name="new_username" autocomplete="off">
+							<label for="new_password">Password: </label>
+							<input id="new_password" type="password" name="new_password" autocomplete="off">
+							<input id="new_user_submit" type="submit" value="create new user">
+						</form>	
+					</div>
 			</div>
 			<div id="message_input">
 				<form method="POST">
@@ -18,12 +28,5 @@
 					<input id="chat_submit" type="submit" value="submit">
 				</form>
 			</div>
-		</div>
-		<div id="reenter_key">
-				<form method="POST">
-					<label for="reenter_input">Please Re-Enter Your Key</label>
-					<input id="reenter_input" type="text" name="message" autocomplete="off">
-					<input id="reenter_submit" type="submit" value="submit">
-				</form>
 		</div>
 {% end %}

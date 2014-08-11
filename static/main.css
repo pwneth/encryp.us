@@ -173,16 +173,54 @@ html, body {
 	background-color: #964342;
 }
 
-#re_enc {
-	margin-top: 15px;
+/* ADD USER STYLES */
+
+
+
+#add_user {
 	background: #ccc;
 }
 
-#re_enc:hover {
+.add_user_highlighted {
+	background: #DDAA62;
+	color: #fff;
+}
+
+#add_user:hover {
 	cursor: pointer;
 	background: #DDAA62;
 	color: #fff;
 }
+
+#add_user_form {
+	display: none;
+	background: #fff;
+	text-align: center;
+	padding: 20px;
+	border-bottom: 5px solid #ccc;
+}
+
+#add_user_form label {
+	margin-top: 15px;
+	display: block;
+	width: 100%;
+	text-align: left;
+	font-family: 'Roboto Slab', serif;
+	font-weight: 700;
+}
+
+#add_user_form input[type="text"], #add_user_form input[type="password"], #add_user_form input[type="submit"] {
+	width: 100%;
+	margin-top: 0px;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+#add_user_form input[type="submit"] {
+	margin-top: 15px;
+}
+
 
 /* FORM STYLES */
 #message_input form {
@@ -253,7 +291,7 @@ input[type="submit"]:hover {
 	padding: 50px !important;
 }
 
-.vex-content input[type="text"] {
+.vex-content input[type="password"] {
 	background-color: #eee !important;
 	border-radius: 0px !important;
 	border: 0px !important;

@@ -112,4 +112,31 @@ $(document).ready(function() {
 			return false;
 		}
 	});
+
+	$("#add_user").click(function() {
+		$("#add_user_form").toggle();
+	});
+
+	$("#new_user_submit").click(function() {
+		var username = $("#new_username").val();
+		var password = $("#new_password").val();
+		if (username == "" || password == "") {
+			$("#new_user_submit").effect( "highlight", {color: 'red'}, 1000 );
+			$("#new_user_submit").attr("value", "can't be empty");
+			return false;
+		} else {
+			$.ajax({
+	            type: "POST",
+	            url: "/createuser",
+	            data: {username: username, password: password},
+	            success: function(){
+					$("#add_user_form").toggle();
+		            $("#add_user").effect( "highlight", {color: '#53ED6A'}, 500 );
+		            $("#new_password").val("");
+		            $("#new_username").val("");
+	            	}
+	            });
+			return false;
+		}
+	});
 });

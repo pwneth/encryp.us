@@ -7,21 +7,12 @@ import json
 from datetime import datetime, date
 from Crypto.Cipher import AES
 import tornado.autoreload
+import redis
 
-# temporary hardcodes AES key for encrypting messages -- will
-# use user generated key later on
-#obj = AES.new("1qazxsw23edcvfr4")
-
-# this is temporary -- will take users from a JSON db later on
-# will also allow for user/pw creation by admin
-allowed_users = {"michael": "password", "admin": "password", "evilghost": "password",
-                 "cooltortoise": "password"}
-
+redis_server = redis.Redis("localhost")
 message_futures = []
 
 # this defines a global function to reload the json data when needed
-
-
 def loadjson():
     with open('static/data.json') as f:
         jsondata = json.load(f)
@@ -85,15 +76,6 @@ class MainHandler(BaseHandler):
 
     def post(self):
         msg = self.get_argument("message")
-
-        # make sure msg is 16 bits
-        # if ((len(msg) % 16) != 0):
-        #     times = 16 - (len(msg) % 16)
-        #     for i in range(1, times + 1):
-        #         msg += " "
-
-        # encrypt the message with b64 and utf-8 encoding
-        # encrypted_msg = base64.b64encode(obj.encrypt(msg)).decode("utf-8")
         time = datetime.now().strftime("%Y-%m-%d %H:%M")
 
         with open('static/data.json') as f:
@@ -112,13 +94,20 @@ class MainHandler(BaseHandler):
         message_futures[:] = []
 
 
-class AccountHandler(BaseHandler):
+class TestHandler(BaseHandler):
+	def get(self):
+		username = redis_server.hget("user-evilghost", "password")
+		self.render("test.html", title="Account Page", username=username)
+
+class CreateUserHandler(BaseHandler):
 
     '''This handler shows account information and will allow user to modify'''
     @tornado.web.authenticated
-    def get(self):
-        self.render("account.html", title="Account Page",
-                    username=self.current_user)
+    def post(self):
+    	get_un = self.get_argument("username")
+    	get_pw = self.get_argument("password")
+
+    	redis_server.hmset("user-" + get_un, {"username":get_un, "password":get_pw})
 
 
 class LoginHandler(BaseHandler):
@@ -138,18 +127,26 @@ class LoginHandler(BaseHandler):
         get_pw = self.get_argument("password")
         get_un = self.get_argument("username")
         next_page = self.get_argument("next_page", default="/")
-        if get_un in allowed_users and allowed_users[get_un] == get_pw:
+
+        if redis_server.hget("user-" + get_un, "password") is None:
+        	self.render("login.html", title="Login Page",
+                        error="user does not exist", next_page=next_page)
+        else:
+        	expected_pw = redis_server.hget("user-" + get_un, "password").decode("utf-8")
+        
+        if get_pw == expected_pw:
             self.set_secure_cookie("user", get_un)
             self.redirect(next_page)
-        else:
+        else: 
             self.render("login.html", title="Login Page",
-                        error="username or pw wrong", next_page=next_page)
+                        error="password is wrong", next_page=next_page)
+
 
 
 class LogoutHandler(BaseHandler):
 
     '''This handler clears the user cookie'''
-
+    @tornado.web.authenticated
     def get(self):
         self.clear_cookie("user")
         self.redirect("/")
@@ -159,8 +156,9 @@ def make_app():
     '''this is the main application function'''
     app = Application([
         url(r"/", MainHandler),
-        url(r"/account", AccountHandler),
+        url(r"/test", TestHandler),
         url(r"/message", MessageHandler),
+        url(r"/createuser", CreateUserHandler),
         url(r"/login", LoginHandler),
         url(r"/logout", LogoutHandler)
     ],
