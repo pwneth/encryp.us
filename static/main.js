@@ -120,6 +120,11 @@ $(document).ready(function() {
 	$("#new_user_submit").click(function() {
 		var username = $("#new_username").val();
 		var password = $("#new_password").val();
+		if ($("#new_admin:checked").val()) {
+			var admin = "yes"
+		} else {
+			var admin = "no"
+		}
 		if (username == "" || password == "") {
 			$("#new_user_submit").effect( "highlight", {color: 'red'}, 1000 );
 			$("#new_user_submit").attr("value", "can't be empty");
@@ -128,7 +133,7 @@ $(document).ready(function() {
 			$.ajax({
 	            type: "POST",
 	            url: "/createuser",
-	            data: {username: username, password: password},
+	            data: {username: username, password: password, admin: admin},
 	            success: function(){
 					$("#add_user_form").toggle();
 		            $("#add_user").effect( "highlight", {color: '#53ED6A'}, 500 );

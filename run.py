@@ -71,8 +71,9 @@ class MainHandler(BaseHandler):
     '''MainHandler shows the chat application @ home.html'''
     @tornado.web.authenticated
     def get(self):
-        self.render("home.html", title="Home Page",
-                    username=self.current_user, messages=append_messages())
+        admin = redis_server.hget(b"user-" + self.current_user, "admin")
+       	self.render("home.html", title="Home Page", 
+        	username=self.current_user, messages=append_messages(), admin=admin)
 
     def post(self):
         msg = self.get_argument("message")
@@ -106,8 +107,9 @@ class CreateUserHandler(BaseHandler):
     def post(self):
     	get_un = self.get_argument("username")
     	get_pw = self.get_argument("password")
+    	get_admin = self.get_argument("admin")
 
-    	redis_server.hmset("user-" + get_un, {"username":get_un, "password":get_pw})
+    	redis_server.hmset("user-" + get_un, {"username":get_un, "password":get_pw, "admin":get_admin})
 
 
 class LoginHandler(BaseHandler):
