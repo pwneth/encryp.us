@@ -1,11 +1,13 @@
+var session_password = false;
+
 $(document).ready(function() {
 	//decrypt all messages function
 	function decrypt_messages() {
 		$(".msg").each(function( index ) {
 			var encrypted_content = $(this).data("msg");
 			var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, session_password));
-			if (decrypted_content.substr(0,3) == "xxx") {
-				$(this).text(decrypted_content.substr(3));
+			if (decrypted_content.substr(0,session_password.length) == session_password) {
+				$(this).text(decrypted_content.substr(session_password.length));
 			} else {
 				vex_prompt();
 				return false;
@@ -57,7 +59,7 @@ $(document).ready(function() {
     };
 
 	if (sessionStorage.getItem("session_password")) {
-		var session_password = sessionStorage.getItem("session_password");
+		session_password = sessionStorage.getItem("session_password");
 	}
 
 	if ($("#chat_input")) {
@@ -87,7 +89,7 @@ $(document).ready(function() {
 	messageDiv.scrollTop = messageDiv.scrollHeight;
 
 	$("#chat_submit").click(function() {
-		var message = "xxx" + $("#chat_input").val();
+		var message = session_password + $("#chat_input").val();
 		if (message == "") {
 			$("#chat_submit").effect( "highlight", {color: 'red'}, 1000 );
 			$("#chat_submit").attr("value", "can't be empty");
