@@ -61,9 +61,9 @@ class MessageHandler(BaseHandler):
         message_futures.append(future)
 
     def render_now(self, future):
+        admin = redis_server.hget(b"user-" + self.current_user, "admin")
         self.render("home.html", title="Home Page",
-                    username=self.current_user, messages=append_messages())
-        # self.finish()
+                    username=self.current_user, messages=append_messages(), admin=admin)
 
 
 class MainHandler(BaseHandler):

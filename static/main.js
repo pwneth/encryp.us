@@ -114,7 +114,7 @@ $(document).ready(function() {
 	});
 
 	$("#add_user").click(function() {
-		$("#add_user_form").toggle();
+		$("#add_user_form").slideToggle();
 	});
 
 	$("#new_user_submit").click(function() {
@@ -135,7 +135,7 @@ $(document).ready(function() {
 	            url: "/createuser",
 	            data: {username: username, password: password, admin: admin},
 	            success: function(){
-					$("#add_user_form").toggle();
+					$("#add_user_form").slideToggle();
 		            $("#add_user").effect( "highlight", {color: '#53ED6A'}, 500 );
 		            $("#new_password").val("");
 		            $("#new_username").val("");
