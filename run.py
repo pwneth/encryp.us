@@ -26,23 +26,16 @@ class decrypt_msg(object):
 		self.name = msg['name']
 		self.time = msg['time']
 		self.msg = msg['message']
-		# message = base64.b64decode(msg['message'])
-		# self.msg = obj.decrypt(message).decode("utf-8")
 
 
 # loads json data and append decrypted information to an array and return
 # it for the templates to use
 def append_messages():
-	# json_data = loadjson()
 	messages = []
-
 	message_data = redis_server.lrange("messages", "0", "-1")
 
 	for f in message_data:
 		messages.append(decrypt_msg(json.loads(f.decode("utf-8"))))
-
-	# for data in json_data['messages']:
-	#     messages.append(decrypt_msg(data))
 
 	return messages
 
@@ -57,18 +50,25 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MessageHandler(BaseHandler):
 
-    '''MessageHandler handles each message'''
-    @tornado.web.authenticated
-    @tornado.web.asynchronous
-    def get(self):
-        future = Future()
-        future.add_done_callback(self.render_now)
-        message_futures.append(future)
+	'''MessageHandler handles each message'''
+	@tornado.web.authenticated
+	@tornado.web.asynchronous
+	def get(self):
+		future = Future()
+		future.add_done_callback(self.render_now)
+		message_futures.append(future)
 
-    def render_now(self, future):
-        admin = redis_server.hget(b"user-" + self.current_user, "admin")
-        self.render("home.html", title="Home Page",
-                    username=self.current_user, messages=append_messages(), admin=admin)
+	def render_now(self, future):
+		admin = redis_server.hget(b"user-" + self.current_user, "admin")
+		self.render("home.html", title="Home Page",
+					username=self.current_user, messages=append_messages(), admin=admin)
+
+class DeleteMessagesHandler(BaseHandler):
+
+	'''MessageHandler handles each message'''
+	@tornado.web.authenticated
+	def post(self):
+		redis_server.ltrim("messages", 1, 0)
 
 
 class MainHandler(BaseHandler):
@@ -77,25 +77,15 @@ class MainHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         admin = redis_server.hget(b"user-" + self.current_user, "admin")
-       	self.render("home.html", title="Home Page", 
-        	username=self.current_user, messages=append_messages(), admin=admin)
+        self.render("home.html", title="Home Page",
+                    username=self.current_user, messages=append_messages(), admin=admin)
 
     def post(self):
         msg = self.get_argument("message")
         time = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-        # with open('static/data.json') as f:
-        #     data = json.load(f)
-
         json_message = json.dumps({'name':self.current_user.decode("utf-8"), 'message':msg, 'time':time})
         redis_server.rpush("messages", json_message)
-
-        # data['messages'].append({'name': self.current_user.decode("utf-8"),
-        #                          'message': msg, #encrypted_msg
-        #                          'time': time})
-
-        # with open('static/data.json', 'w') as f:
-        #     json.dump(data, f)
 
         for f in message_futures:
             f.set_result(None)
@@ -130,35 +120,33 @@ class CreateUserHandler(BaseHandler):
 
 class LoginHandler(BaseHandler):
 
-    '''This handler shows the login page if user is not logged in'''
+	'''This handler shows the login page if user is not logged in'''
 
-    def get(self):
-        next_page = self.get_argument("next", default="/")
-        if self.current_user:
-            self.redirect(next_page)
-        else:
-            self.render("login.html", title="Login Page",
-                        error=None, next_page=next_page)
+	def get(self):
+		next_page = self.get_argument("next", default="/")
+		if self.current_user:
+			self.redirect(next_page)
+		else:
+			self.render("login.html", title="Login Page",
+						error=None, next_page=next_page)
 
     # post will make sure that user and password combination are valid
-    def post(self):
-        get_pw = self.get_argument("password")
-        get_un = self.get_argument("username")
-        next_page = self.get_argument("next_page", default="/")
+	def post(self):
+		get_pw = self.get_argument("password")
+		get_un = self.get_argument("username")
+		next_page = self.get_argument("next_page", default="/")
 
-        if redis_server.hget("user-" + get_un, "password") is None:
-        	self.render("login.html", title="Login Page",
-                        error="user does not exist", next_page=next_page)
-        else:
-        	expected_pw = redis_server.hget("user-" + get_un, "password").decode("utf-8")
-        
-        if get_pw == expected_pw:
-            self.set_secure_cookie("user", get_un)
-            self.redirect(next_page)
-        else: 
-            self.render("login.html", title="Login Page",
-                        error="password is wrong", next_page=next_page)
-
+		if redis_server.hget("user-" + get_un, "password") is None:
+			self.render("login.html", title="Login Page",
+						error="user does not exist", next_page=next_page)
+		else:
+			expected_pw = redis_server.hget("user-" + get_un, "password").decode("utf-8")
+			if get_pw == expected_pw:
+				self.set_secure_cookie("user", get_un)
+				self.redirect(next_page)
+			else: 
+				self.render("login.html", title="Login Page",
+							error="password is wrong", next_page=next_page)
 
 
 class LogoutHandler(BaseHandler):
@@ -177,6 +165,7 @@ def make_app():
         url(r"/test", TestHandler),
         url(r"/message", MessageHandler),
         url(r"/createuser", CreateUserHandler),
+        url(r"/deletemessages", DeleteMessagesHandler),
         url(r"/login", LoginHandler),
         url(r"/logout", LogoutHandler)
     ],

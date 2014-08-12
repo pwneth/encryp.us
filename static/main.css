@@ -152,6 +152,8 @@ html, body {
 	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
+
+
 #message_input {
 	float: left;
 	width: 100%;
@@ -170,6 +172,16 @@ html, body {
 }
 
 #logout:hover {
+	background-color: #964342;
+}
+
+#delete_messages {
+	background-color: #E37C7B;
+	color: #fff;
+}
+
+#delete_messages:hover {
+	cursor: pointer;
 	background-color: #964342;
 }
 

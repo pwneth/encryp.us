@@ -37,7 +37,7 @@ $(document).ready(function() {
 	function vex_prompt() {
 		vex.dialog.prompt({
 	  		message: 'Please enter your encryption key',
-	 		placeholder: '',
+	 		placeholder: 'Try to use weird characters and numbers',
 	  		showCloseButton: false,
 	  		overlayClosesOnClick: false,
 	  		callback: function(value) {
@@ -143,5 +143,24 @@ $(document).ready(function() {
 	            });
 			return false;
 		}
+	});
+
+	$("#delete_messages").click(function() {
+		vex.dialog.confirm({
+			message: 'Are you sure you want to delete the messages?',
+			callback: function(value) {
+				if (value == true) {
+					$.ajax({
+			            type: "POST",
+			            url: "/deletemessages",
+			            success: function(){
+				            $("#delete_messages").effect( "highlight", {color: '#53ED6A'}, 500 );
+				            $("#messages").html("");
+			            	}
+			            });
+					return false;
+				}
+			}
+		});		
 	});
 });
