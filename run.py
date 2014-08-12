@@ -22,24 +22,29 @@ def loadjson():
 # class decrypts the message object contents
 class decrypt_msg(object):
 
-    def __init__(self, msg):
-        self.name = msg['name']
-        self.time = msg['time']
-        self.msg = msg['message']
-        # message = base64.b64decode(msg['message'])
-        # self.msg = obj.decrypt(message).decode("utf-8")
+	def __init__(self, msg):
+		self.name = msg['name']
+		self.time = msg['time']
+		self.msg = msg['message']
+		# message = base64.b64decode(msg['message'])
+		# self.msg = obj.decrypt(message).decode("utf-8")
 
 
 # loads json data and append decrypted information to an array and return
 # it for the templates to use
 def append_messages():
-    json_data = loadjson()
-    messages = []
+	# json_data = loadjson()
+	messages = []
 
-    for data in json_data['messages']:
-        messages.append(decrypt_msg(data))
+	message_data = redis_server.lrange("messages", "0", "-1")
 
-    return messages
+	for f in message_data:
+		messages.append(decrypt_msg(json.loads(f.decode("utf-8"))))
+
+	# for data in json_data['messages']:
+	#     messages.append(decrypt_msg(data))
+
+	return messages
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -79,15 +84,18 @@ class MainHandler(BaseHandler):
         msg = self.get_argument("message")
         time = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-        with open('static/data.json') as f:
-            data = json.load(f)
+        # with open('static/data.json') as f:
+        #     data = json.load(f)
 
-        data['messages'].append({'name': self.current_user.decode("utf-8"),
-                                 'message': msg, #encrypted_msg
-                                 'time': time})
+        json_message = json.dumps({'name':self.current_user.decode("utf-8"), 'message':msg, 'time':time})
+        redis_server.rpush("messages", json_message)
 
-        with open('static/data.json', 'w') as f:
-            json.dump(data, f)
+        # data['messages'].append({'name': self.current_user.decode("utf-8"),
+        #                          'message': msg, #encrypted_msg
+        #                          'time': time})
+
+        # with open('static/data.json', 'w') as f:
+        #     json.dump(data, f)
 
         for f in message_futures:
             f.set_result(None)
@@ -98,7 +106,15 @@ class MainHandler(BaseHandler):
 class TestHandler(BaseHandler):
 	def get(self):
 		username = redis_server.hget("user-evilghost", "password")
-		self.render("test.html", title="Account Page", username=username)
+
+		whatever = redis_server.lrange("messages", "0", "-1")
+
+		messages = []
+		for f in whatever:
+			messages.append(f.decode("utf-8"))
+
+
+		self.render("test.html", title="Account Page", username=username, whatever=messages)
 
 class CreateUserHandler(BaseHandler):
 
