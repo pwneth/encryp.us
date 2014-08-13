@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
 		<div id="chat">
+			<div id="nav">
+				<ul>
+					<li id="menu_btn">?</li>
+					<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
+					<li id="delete_messages" class="hidden_li">delete messages</li>
+					<li id="edit_profile" class="hidden_li">edit profile</li>
+					{% if admin == b"yes" %}
+					<li id="add_user" class="hidden_li">+ user</li>
+					{% end %}
+				</ul>
+			</div>
 			<div id="messages">
 				<div id="messages_inner">
 					{% for msg in messages %}
@@ -9,11 +20,7 @@
 				</div>
 			</div>
 			<div id="chatters">
-				<div id="logout" class="menu_item"><a href="/logout">logout</a></div>
-				<div id="welcome_msg" class="menu_item">Welcome, {{ username }}.</div>
-				<div id="delete_messages" class="menu_item">delete messages</div>
 				{% if admin == b"yes" %}
-				<div id="add_user" class="menu_item">create new user</div>
 					<div id="add_user_form">
 						<form method="POST">
 							<label for="new_username">Username: </label>
@@ -26,6 +33,7 @@
 						</form>	
 					</div>
 				{% end %}
+				<div id="welcome_msg">Logged in as {{ username }}.</div>
 			</div>
 			<div id="message_input">
 				<form method="POST">

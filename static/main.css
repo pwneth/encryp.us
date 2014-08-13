@@ -8,6 +8,37 @@ html, body {
 	height: 100%;
 }
 
+#nav {
+	z-index: 10;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	padding: 0;
+	margin: 0;
+	font-family: 'Roboto Slab', serif;
+	pointer-events:none;
+}
+
+#nav ul {
+	margin: 0;
+	padding: 0;
+	pointer-events: auto;
+}
+
+#nav ul li{
+	list-style: none;
+	text-align: center;
+	font-weight: 700;
+	position: relative;
+	color: #fff;
+	float: left;
+	margin: 10px 5px 0px 5px;
+	padding: 0 10px;
+	height: 50px;
+	line-height: 50px;
+}
+
 #login_title {
 	font-size: 60px;
 	font-family: "Geo",sans-serif;
@@ -140,12 +171,19 @@ html, body {
 }
 
 .menu_item {
-	width: 100%;
+	max-width: 300px;
 	text-align: center;
 	line-height: 40px;
+	margin: 0 auto;
 }
 
 #welcome_msg {
+	text-align: center;
+	position: absolute;
+	padding: 10px;
+	bottom: 0;
+	right: 0;
+	left: 0;
 	background: #fff;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
@@ -166,7 +204,6 @@ html, body {
 }
 
 #logout a{
-	display: block;
 	color: #fff;
 	text-decoration: none;
 }
@@ -176,13 +213,42 @@ html, body {
 }
 
 #delete_messages {
-	background-color: #E37C7B;
+	background-color: #964342;
 	color: #fff;
 }
 
 #delete_messages:hover {
 	cursor: pointer;
+	background-color: #E37C7B;
+}
+
+#edit_profile {
+	background-color: #4A7896;
+	color: #fff;
+}
+
+#edit_profile:hover {
+	cursor: pointer;
+	background-color: #4E88B0;
+}
+
+#menu_btn {
+	width: 50px;
+	font-size: 40px;
 	background-color: #964342;
+	color: #fff;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+#menu_btn:hover {
+	cursor: pointer;
+	background-color: #E37C7B;
+}
+
+.hidden_li {
+	display: none;
 }
 
 /* ADD USER STYLES */
@@ -190,7 +256,7 @@ html, body {
 
 
 #add_user {
-	background: #ccc;
+	background: #4A7896;
 }
 
 .add_user_highlighted {
@@ -200,16 +266,21 @@ html, body {
 
 #add_user:hover {
 	cursor: pointer;
-	background: #DDAA62;
+	background: #4E88B0;
 	color: #fff;
 }
 
 #add_user_form {
+	width: 100%;
+	margin: 0 auto;
 	display: none;
 	background: rgba(255,255,255,1);
 	text-align: center;
 	padding: 20px;
 	border-bottom: 5px solid #ccc;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
 #add_user_form label {
