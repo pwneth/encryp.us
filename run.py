@@ -92,6 +92,14 @@ class MainHandler(BaseHandler):
 
         message_futures[:] = []
 
+class AccountHandler(BaseHandler):
+
+	'''AccountHandler allows user to edit their user info / password'''
+	@tornado.web.authenticated
+	def post(self):
+		self.render("test.html", title="Account Page", username=username, whatever=messages)
+
+
 
 class TestHandler(BaseHandler):
 	def get(self):

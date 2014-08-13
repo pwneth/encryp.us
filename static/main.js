@@ -165,6 +165,6 @@ $(document).ready(function() {
 	});
 
 	$("#menu_btn").click(function() {
-		$(".hidden_li").slideToggle();
+		$(".hidden_li").toggle();
 	});
 });

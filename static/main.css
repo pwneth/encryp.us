@@ -16,7 +16,7 @@ html, body {
 	right: 0;
 	padding: 0;
 	margin: 0;
-	font-family: 'Roboto Slab', serif;
+	font-family: "Geo",sans-serif;
 	pointer-events:none;
 }
 
@@ -27,16 +27,24 @@ html, body {
 }
 
 #nav ul li{
+	border: 5px solid #62ACDD;
+	font-size: 25px;
+	color: #62ACDD;
 	list-style: none;
 	text-align: center;
-	font-weight: 700;
 	position: relative;
-	color: #fff;
 	float: left;
 	margin: 10px 5px 0px 5px;
 	padding: 0 10px;
-	height: 50px;
-	line-height: 50px;
+	line-height: 40px;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+#nav ul li:hover{
+	background-color: #62ACDD;
+	color: #fff;
 }
 
 #login_title {
@@ -200,51 +208,39 @@ html, body {
 }
 
 #logout {
-	background-color: #E37C7B;
 }
 
 #logout a{
-	color: #fff;
+	color: #62ACDD;
 	text-decoration: none;
+	line-height: 40px;
+	display: block;
+	height: 100%;
 }
 
-#logout:hover {
-	background-color: #964342;
+#logout a:hover {
+	color: #fff;
 }
 
 #delete_messages {
-	background-color: #964342;
-	color: #fff;
 }
 
 #delete_messages:hover {
 	cursor: pointer;
-	background-color: #E37C7B;
 }
 
 #edit_profile {
-	background-color: #4A7896;
-	color: #fff;
 }
 
 #edit_profile:hover {
 	cursor: pointer;
-	background-color: #4E88B0;
 }
 
 #menu_btn {
-	width: 50px;
-	font-size: 40px;
-	background-color: #964342;
-	color: #fff;
-	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
-	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
 #menu_btn:hover {
 	cursor: pointer;
-	background-color: #E37C7B;
 }
 
 .hidden_li {
@@ -256,18 +252,13 @@ html, body {
 
 
 #add_user {
-	background: #4A7896;
 }
 
 .add_user_highlighted {
-	background: #DDAA62;
-	color: #fff;
 }
 
 #add_user:hover {
 	cursor: pointer;
-	background: #4E88B0;
-	color: #fff;
 }
 
 #add_user_form {
