@@ -8,6 +8,9 @@ html, body {
 	height: 100%;
 }
 
+body {
+}
+
 #nav {
 	z-index: 10;
 	position: fixed;
@@ -28,6 +31,7 @@ html, body {
 
 #nav ul li{
 	border: 5px solid #62ACDD;
+	background: #fff;
 	font-size: 25px;
 	color: #62ACDD;
 	list-style: none;
@@ -43,6 +47,7 @@ html, body {
 }
 
 #nav ul li:hover{
+	cursor: pointer;
 	background-color: #62ACDD;
 	color: #fff;
 }
@@ -173,6 +178,7 @@ html, body {
 	background: #62ACDD;
 	position: relative;
 	border-left: 5px solid #ccc;
+	overflow: none;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
@@ -268,7 +274,6 @@ html, body {
 	background: rgba(255,255,255,1);
 	text-align: center;
 	padding: 20px;
-	border-bottom: 5px solid #ccc;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
@@ -295,6 +300,48 @@ html, body {
 	margin-top: 15px;
 }
 
+/* DELETE USER STYLES */
+
+.sidebar_title {
+	color: #62ACDD;
+	font-family: "Geo",sans-serif;
+	font-size: 40px;
+}
+
+#del_user_form {
+	padding: 20px;
+	width: 100%;
+	margin: 0 auto;
+	display: none;
+	background: rgba(255,255,255,1);
+	text-align: center;
+	border-bottom: 5px #fff solid;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+.user_to_del {
+	width: 100%;
+	background: #62ACDD;
+	font-weight: 700;
+	line-height: 30px;
+	border-top: 5px #fff solid;
+	color: #fff;
+}
+
+.user_to_del:hover {
+	background: #E37C7B;
+	cursor: pointer;
+}
+
+.user_to_del:hover:after {
+	content: "?";
+}
+
+.user_to_del:hover:before {
+	content: "Delete ";
+}
 
 /* FORM STYLES */
 #message_input form {

@@ -6,9 +6,9 @@
 					<li id="menu_btn">menu</li>
 					<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
 					<li id="delete_messages" class="hidden_li">delete messages</li>
-					<li id="edit_profile" class="hidden_li">edit profile</li>
-					{% if admin == b"yes" %}
+					{% if admin %}
 					<li id="add_user" class="hidden_li">+ user</li>
+					<li id="del_user" class="hidden_li">- user</li>
 					{% end %}
 				</ul>
 			</div>
@@ -20,9 +20,10 @@
 				</div>
 			</div>
 			<div id="chatters">
-				{% if admin == b"yes" %}
+				{% if admin %}
 					<div id="add_user_form">
 						<form method="POST">
+							<div class="sidebar_title">ADD USER</div>
 							<label for="new_username">Username: </label>
 							<input id="new_username" type="text" name="new_username" autocomplete="off">
 							<label for="new_password">Password: </label>
@@ -31,6 +32,8 @@
 							<input id="new_admin" type="checkbox" name="new_admin" value="yes">
 							<input id="new_user_submit" type="submit" value="create new user">
 						</form>	
+					</div>
+					<div id="del_user_form">
 					</div>
 				{% end %}
 				<div id="welcome_msg">Logged in as {{ username }}.</div>

@@ -12,12 +12,6 @@ import redis
 redis_server = redis.Redis("localhost")
 message_futures = []
 
-# this defines a global function to reload the json data when needed
-def loadjson():
-    with open('static/data.json') as f:
-        jsondata = json.load(f)
-    return jsondata
-
 
 # class decrypts the message object contents
 class decrypt_msg(object):
@@ -39,13 +33,37 @@ def append_messages():
 
 	return messages
 
+#function gets userlist and admin status of current_user
+def user_list():
+	user_list = []
+	redis_user_list = redis_server.keys("user-*")
+	for user in redis_user_list:
+		username = redis_server.hget(user, "username")
+		decoded_user = username.decode("utf-8")
+		user_list.append(decoded_user)
+
+	return user_list
+
+#check if someone is admin
+def is_admin(current_user):
+	return redis_server.hget(b"user-" + current_user, "admin") == b"yes"
+
+
+#check if admin decorator
+def only_admin(func):
+	def wrapper(self, *args, **kwargs):
+		if not is_admin(self.current_user):
+			return "404"
+		return func(self, *args, **kwargs)
+	return wrapper
+
 
 class BaseHandler(tornado.web.RequestHandler):
 
-    '''BaseHandler checks that user cookie is set'''
+	'''BaseHandler checks that user cookie is set'''
 
-    def get_current_user(self):
-        return self.get_secure_cookie("user")
+	def get_current_user(self):
+		return self.get_secure_cookie("user")
 
 
 class MessageHandler(BaseHandler):
@@ -59,9 +77,10 @@ class MessageHandler(BaseHandler):
 		message_futures.append(future)
 
 	def render_now(self, future):
-		admin = redis_server.hget(b"user-" + self.current_user, "admin")
+		admin = is_admin(self.current_user)
 		self.render("home.html", title="Home Page",
 					username=self.current_user, messages=append_messages(), admin=admin)
+
 
 class DeleteMessagesHandler(BaseHandler):
 
@@ -70,16 +89,16 @@ class DeleteMessagesHandler(BaseHandler):
 	def post(self):
 		redis_server.ltrim("messages", 1, 0)
 
-
 class MainHandler(BaseHandler):
 
     '''MainHandler shows the chat application @ home.html'''
     @tornado.web.authenticated
     def get(self):
-        admin = redis_server.hget(b"user-" + self.current_user, "admin")
+        admin = is_admin(self.current_user)
         self.render("home.html", title="Home Page",
                     username=self.current_user, messages=append_messages(), admin=admin)
 
+    @tornado.web.authenticated
     def post(self):
         msg = self.get_argument("message")
         time = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -92,6 +111,7 @@ class MainHandler(BaseHandler):
 
         message_futures[:] = []
 
+
 class AccountHandler(BaseHandler):
 
 	'''AccountHandler allows user to edit their user info / password'''
@@ -100,30 +120,41 @@ class AccountHandler(BaseHandler):
 		self.render("test.html", title="Account Page", username=username, whatever=messages)
 
 
-
 class TestHandler(BaseHandler):
 	def get(self):
-		username = redis_server.hget("user-evilghost", "password")
-
-		whatever = redis_server.lrange("messages", "0", "-1")
+		whatever = redis_server.keys("user-*")
 
 		messages = []
 		for f in whatever:
 			messages.append(f.decode("utf-8"))
 
+		self.render("test.html", title="Account Page", whatever=messages)
 
-		self.render("test.html", title="Account Page", username=username, whatever=messages)
 
-class CreateUserHandler(BaseHandler):
+class UserHandler(BaseHandler):
 
-    '''This handler shows account information and will allow user to modify'''
-    @tornado.web.authenticated
-    def post(self):
-    	get_un = self.get_argument("username")
-    	get_pw = self.get_argument("password")
-    	get_admin = self.get_argument("admin")
+	'''This is the handler that handles user creation and deletion'''
+	@tornado.web.authenticated
+	@only_admin
+	def get(self):
+		users = user_list()
+		self.write(json.dumps(users))
 
-    	redis_server.hmset("user-" + get_un, {"username":get_un, "password":get_pw, "admin":get_admin})
+	@tornado.web.authenticated
+	@only_admin	
+	def post(self):
+		get_un = self.get_argument("username")
+		get_pw = self.get_argument("password")
+		get_admin = self.get_argument("admin")
+
+		redis_server.hmset("user-" + get_un, {"username":get_un, "password":get_pw, "admin":get_admin})
+
+	@tornado.web.authenticated
+	@only_admin
+	def delete(self):
+		get_un = self.get_argument("usertodelete")
+
+		redis_server.delete("user-" + get_un)
 
 
 class LoginHandler(BaseHandler):
@@ -172,8 +203,8 @@ def make_app():
         url(r"/", MainHandler),
         url(r"/test", TestHandler),
         url(r"/message", MessageHandler),
-        url(r"/createuser", CreateUserHandler),
         url(r"/deletemessages", DeleteMessagesHandler),
+        url(r"/user", UserHandler),
         url(r"/login", LoginHandler),
         url(r"/logout", LogoutHandler)
     ],

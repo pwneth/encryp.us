@@ -53,6 +53,31 @@ $(document).ready(function() {
 		});
 	}
 
+	//allow for delete user even to be called again after users are loaded
+	function reload_click_del_user() {
+		$(".user_to_del").click(function() {
+			var user = $(this).text();
+			vex.dialog.confirm({
+				message: 'Are you sure you want to delete ' + user + '?',
+				callback: function(value) {
+					if (value == true) {
+						$.ajax({
+				            type: "DELETE",
+				            url: "/user",
+				            data: {usertodelete: user},
+				            success: function(){				            
+									$("#del_user_form").slideUp(function() {
+										$("#del_user_form").html("");
+									});
+				            	}
+				            });
+						return false;
+					}
+				}
+			});		
+		});
+	}
+
 	//check if scroll bar and scroll down if
     $.fn.hasScrollBar = function() {
         return this.get(0).scrollHeight > this.height();
@@ -90,7 +115,7 @@ $(document).ready(function() {
 
 	$("#chat_submit").click(function() {
 		var message = session_password + $("#chat_input").val();
-		if (message == "") {
+		if (message == session_password) {
 			$("#chat_submit").effect( "highlight", {color: 'red'}, 1000 );
 			$("#chat_submit").attr("value", "can't be empty");
 			return false;
@@ -115,6 +140,11 @@ $(document).ready(function() {
 
 	$("#add_user").click(function() {
 		$("#add_user_form").slideToggle();
+		if ($("#del_user_form").is(":visible")) {
+	    	$("#del_user_form").slideUp(function() {
+	    		$("#del_user_form").html("");
+	    	});
+		}
 	});
 
 	$("#new_user_submit").click(function() {
@@ -132,7 +162,7 @@ $(document).ready(function() {
 		} else {
 			$.ajax({
 	            type: "POST",
-	            url: "/createuser",
+	            url: "/user",
 	            data: {username: username, password: password, admin: admin},
 	            success: function(){
 					$("#add_user_form").slideToggle();
@@ -167,4 +197,33 @@ $(document).ready(function() {
 	$("#menu_btn").click(function() {
 		$(".hidden_li").toggle();
 	});
+
+	$("#del_user").click(function() {
+		if ($("#add_user_form").is(":visible")) {
+	    	$("#add_user_form").slideUp();
+		}
+
+		if ($("#del_user_form").is(":visible")) {
+	    	$("#del_user_form").slideUp(function() {
+	    		$("#del_user_form").html("");
+	    	});
+		} else {
+			$.ajax({
+				dataType: "json",
+	            type: "GET",
+	            url: "/user",
+	            success: function(data){
+	            	$("#del_user_form").append("<div class=\"sidebar_title\">DELETE USER</div>");
+	        		for (var i = 0; i < data.length; i++) {
+	            		console.log(data[i]);
+	            		$("#del_user_form").append("<div class=\"user_to_del\">"+data[i]+"</div>");
+	            	}
+	            	reload_click_del_user();			            	
+			    	$("#del_user_form").slideDown();
+	            }
+	        });
+	    } 
+	});
+
+
 });
