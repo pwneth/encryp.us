@@ -5,7 +5,6 @@ import tornado.httputil
 import base64
 import json
 from datetime import datetime, date
-from Crypto.Cipher import AES
 import tornado.autoreload
 import redis
 
