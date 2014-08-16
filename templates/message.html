@@ -1,9 +1,13 @@
 <div class="message">
+	{% if escape(username) == escape(msg.name) %}
 	<div class="name">
-		{{ msg.name }}:&nbsp;
+	{% else %}
+	<div class="name red">
+	{% end %}
+		{{ escape(msg.name)	 }}:&nbsp;
 	</div>
-	<div class="msg" data-msg="{{ msg.msg }}"></div>
+	<div class="msg" data-msg="{{ escape(msg.msg) }}"></div>
 	<div class="time">
-		@ {{ msg.time }}
+		{{ escape(msg.time) }}
 	</div>
 </div>

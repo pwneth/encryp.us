@@ -100,7 +100,7 @@ class MainHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self):
         msg = self.get_argument("message")
-        time = datetime.now().strftime("%Y-%m-%d %H:%M")
+        time = datetime.now().strftime("%-I:%M %p")
 
         json_message = json.dumps({'name':self.current_user.decode("utf-8"), 'message':msg, 'time':time})
         redis_server.rpush("messages", json_message)
@@ -213,7 +213,7 @@ def make_app():
         cookie_secret="ajfhafaj8r7w73d872")
     app.listen(8888)
     tornado.autoreload.start()
-    tornado.autoreload.watch("static/main.js")
+    tornado.autoreload.watch("static/main.js")	
     tornado.autoreload.watch("static/main.css")
     tornado.autoreload.watch("templates/")
     IOLoop.current().start()

@@ -7,7 +7,7 @@ $(document).ready(function() {
 			var encrypted_content = $(this).data("msg");
 			var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, session_password));
 			if (decrypted_content.substr(0,session_password.length) == session_password) {
-				$(this).text(decrypted_content.substr(session_password.length));
+				$(this).text(decrypted_content.substr(session_password.length)).linkify();
 			} else {
 				vex_prompt();
 				return false;
@@ -15,7 +15,7 @@ $(document).ready(function() {
 		});
 	}
 
-	//load messages into messages div
+	//load messages into messages divs
 	function load_messages(){
 		$("#messages").load("/message #messages_inner", null, function() {
 			decrypt_messages();
@@ -30,6 +30,7 @@ $(document).ready(function() {
 					bottom: 0
 				});
 			}
+
 		});
 	}
 
@@ -224,6 +225,4 @@ $(document).ready(function() {
 	        });
 	    } 
 	});
-
-
 });
