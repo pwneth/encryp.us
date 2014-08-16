@@ -7,10 +7,12 @@
 		<link rel="stylesheet" href="{{ static_url("main.css") }}" type="text/css"/>
 		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+		<script src="{{ static_url("jquery.linkify.min.js") }}"></script>
 		<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
 		<script src="{{ static_url("vex.combined.min.js") }}"></script>
 		<script>vex.defaultOptions.className = 'vex-theme-os';</script>
 		<script src="{{ static_url("main.js") }}"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body>
 	{% block content %}{% end %}
