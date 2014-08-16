@@ -20,8 +20,6 @@ $(document).ready(function() {
 		$("#messages").load("/message #messages_inner", null, function() {
 			decrypt_messages();
 			setTimeout(load_messages, 0);
-			$(".message:last-child").hide();
-			$(".message:last-child").fadeIn("slow");
 			if ($("#messages").hasScrollBar()) {
 				messageDiv.scrollTop = messageDiv.scrollHeight;
 			} else {
