@@ -170,6 +170,10 @@ body {
 	font-weight: 300;
 }
 
+.msg a {
+	color: #62ACDD;
+}
+
 .time {
 	color: #ccc;
 	float: right;
