@@ -15,10 +15,18 @@ $(document).ready(function() {
 		});
 	}
 
+	var badge = 0;
+	var favicon = new Favico({
+        animation : 'popFade'
+    });
+    favicon.badge(badge);
+
 	//load messages into messages divs
 	function load_messages(){
 		$("#messages").load("/message #messages_inner", null, function() {
 			decrypt_messages();
+			badge = badge + 1;
+	        favicon.badge(badge);
 			setTimeout(load_messages, 0);
 			if ($("#messages").hasScrollBar()) {
 				messageDiv.scrollTop = messageDiv.scrollHeight;
@@ -131,6 +139,7 @@ $(document).ready(function() {
 						$("#chat_input").val("");
 						$("#chat_submit").attr("value", "submit");
 						$("#chat_input").focus();
+						badge = -1;
 	            	}
 	            });
 			return false;
