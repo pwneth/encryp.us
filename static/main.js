@@ -1,5 +1,10 @@
 var session_password = false;
 
+// var badge = 0;
+// var favicon = new Favico({
+//     animation : 'popFade'
+// });
+
 $(document).ready(function() {
 	//decrypt all messages function
 	function decrypt_messages() {
@@ -15,18 +20,14 @@ $(document).ready(function() {
 		});
 	}
 
-	var badge = 0;
-	var favicon = new Favico({
-        animation : 'popFade'
-    });
-    favicon.badge(badge);
+	
 
 	//load messages into messages divs
 	function load_messages(){
+		// favicon.badge(badge);
+		// badge = badge + 1;
 		$("#messages").load("/message #messages_inner", null, function() {
 			decrypt_messages();
-			badge = badge + 1;
-	        favicon.badge(badge);
 			setTimeout(load_messages, 0);
 			if ($("#messages").hasScrollBar()) {
 				messageDiv.scrollTop = messageDiv.scrollHeight;
@@ -139,7 +140,8 @@ $(document).ready(function() {
 						$("#chat_input").val("");
 						$("#chat_submit").attr("value", "submit");
 						$("#chat_input").focus();
-						badge = -1;
+						// badge = 0;
+						// favicon.badge(badge);
 	            	}
 	            });
 			return false;
