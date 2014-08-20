@@ -1,6 +1,3 @@
-
-
-
 var session_password = false;
 // var badge = 0;
 // var favicon = new Favico({
@@ -8,17 +5,6 @@ var session_password = false;
 // });
 
 $(document).ready(function() {
-
-	function getUrlVars() {
-	    var vars = {};
-	    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-	        vars[key] = value;
-	    });
-	    return vars;
-	}
-
-	var session_room = getUrlVars()["room"];
-	sessionStorage.setItem("session_room", session_room);
 
 	//decrypt all messages function
 	function decrypt_messages() {
@@ -101,6 +87,28 @@ $(document).ready(function() {
 	}
 
 
+	function getUrlVars() {
+	    var vars = {};
+	    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+	        vars[key] = value;
+	    });
+	    return vars;
+	}
+
+	if ((sessionStorage.getItem("session_room") != getUrlVars()["room"]) && (window.location.pathname == "/chat")) {
+		if ((!session_password) && window.location.pathname == "/chat") {
+			vex_prompt();
+		} else {
+			decrypt_messages();
+		}
+	} else {
+		decrypt_messages();
+	}
+
+	var session_room = getUrlVars()["room"];
+	sessionStorage.setItem("session_room", session_room);
+
+
 	$("#menu_btn").click(function() {
 		$(".hidden_li").toggle();
 	});
@@ -132,11 +140,7 @@ $(document).ready(function() {
 
 	setTimeout(load_messages, 0);
 
-	if ((!session_password) && !(window.location.pathname == "/login") && !(window.location.pathname == "/enterroom")) {
-		vex_prompt();
-	} else {
-		decrypt_messages();
-	}
+	
 
 	if (!($("#messages").hasScrollBar())) {
 		$("#messages_inner").css({
