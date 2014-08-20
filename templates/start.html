@@ -1,10 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-		<div id="room_list">
+		<div id="nav">
+			<ul>
+				<li id="menu_btn">menu</li>
+				{% if username %}
+				<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
+				{% end %}
+				<li id="about" class="hidden_li"><a href="/about">about</a></li>
+				<li id="team" class="hidden_li"><a href="/team">team</a></li>
+				<li id="github" class="hidden_li"><a href="/github">github</a></li>
+				<li id="twitter" class="hidden_li"><a href="/twitter">twitter</a></li>
+			</ul>
+		</div>
+		<div id="start_container">
 			{% if username %}
-				<div id="welcome_back">Welcome back, {{ username }}</div>
+				<div id="start_title">Welcome back, {{ username }}</div>
+			{% else %}
+				<div id="start_title">Welcome to Encrypted Chat</div>
 			{% end %}
-				<div id="join_chat"><a href="/login">Join Chat</a></div>
-				<div id="start_chat"><a href="">Start Chat</a></div>
+				<div id="join_chat" class="start_button"><a href="/login?next=joinchat">Join Chat</a></div>
+				<div id="start_chat" class="start_button"><a href="/login?next=startchat">Start Chat</a></div>
 		</div>
 {% end %}

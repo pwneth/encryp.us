@@ -43,14 +43,17 @@ def user_list(room):
 	return user_list
 
 #check if someone is admin
-def is_admin(current_user):
-	return redis_server.hget("user-" + current_user, "admin") == "yes"
+def is_admin(current_user, room):
+	admin_list = redis_server.lrange("user-admin-" + current_user, "0", "-1")
+	if room in admin_list:
+		return True
+	else:
+		return False
 
-
-#check if admin decorator
+#this decorates a function allowing only admins
 def only_admin(func):
 	def wrapper(self, *args, **kwargs):
-		if not is_admin(self.current_user.decode("utf-8")):
+		if not is_admin(self.current_user.decode("utf-8"), self.get_argument("room")):
 			return "404"
 		return func(self, *args, **kwargs)
 	return wrapper
@@ -63,7 +66,7 @@ def is_allowed_in_chat(current_user, room):
 	else:
 		return False
 
-#check if user is allowed in room decorator
+#this decorates functions allowing only approved users
 def only_allowed_user(func):
 	def wrapper(self, *args, **kwargs):
 		if not is_allowed_in_chat(self.current_user.decode("utf-8"), self.get_argument("room")):
@@ -102,7 +105,7 @@ class MessageHandler(BaseHandler):
 		message_futures.append(future)
 
 	def render_now(self, future):
-		admin = is_admin(self.current_user.decode("utf-8"))
+		admin = is_admin(self.current_user.decode("utf-8"), self.room)
 		self.render("home.html", title="Home Page",
 					username=self.current_user, messages=append_messages(self.room), 
 					admin=admin, room=self.room, error=None)
@@ -110,20 +113,58 @@ class MessageHandler(BaseHandler):
 
 class DeleteMessagesHandler(BaseHandler):
 
-	'''MessageHandler handles each message'''
+	'''DeleteMessagesHandler deletes all messages in the chat room'''
 	@tornado.web.authenticated
 	def post(self):
-		redis_server.ltrim("messages", 1, 0)
+		room = self.get_argument("room")
+		redis_server.ltrim("chat-messages-" + room, 1, 0)
+
+class DeleteChatHandler(BaseHandler):
+
+	'''DeleteChatHandler deletes a chat room if user is admin'''
+	@tornado.web.authenticated
+	def post(self):
+		room = self.get_argument("room")
+		redis_server.ltrim("chat-messages-" + room, 1, 0)
 
 
-class RoomHandler(BaseHandler):
+class JoinChatHandler(BaseHandler):
 
-	'''MainHandler shows the chat application @ home.html'''
+	'''JoinChatHandler is called when user wants a join a chat they are already invited to'''
 	@tornado.web.authenticated
 	def get(self):
 		allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
-		self.render("room.html", title="Choose Chat Room",
+		self.render("joinchat.html", title="Join Chat Room",
 					username=self.current_user, room_list=allowed_rooms)
+
+class StartChatHandler(BaseHandler):
+
+	'''StartChatHandler is called when user wants to create a new chat room'''
+	@tornado.web.authenticated
+	def get(self):
+		allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
+		self.render("startchat.html", title="Start Chat Room",
+					username=self.current_user, room_list=allowed_rooms, error=None)
+
+	@tornado.web.authenticated
+	def post(self):
+		get_un = self.current_user
+		get_chatname = self.get_argument("new_chat")
+		existing_rooms = redis_server.keys("chat-messages-*")
+
+		if "chat-messages-" + get_chatname in existing_rooms:
+			error = "Room already exists"
+			allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
+			self.render("startchat.html", title="Start Chat Room",
+					username=self.current_user, room_list=allowed_rooms, error=error)
+		else:
+			time = datetime.now().strftime("%-I:%M %p")
+			message = json.dumps({'name':get_un.decode("utf-8"), 'message':'started a new chat!', 'time':time})
+			# redis_server.rpush("chat-messages-" + get_chatname, message)
+			redis_server.rpush("user-rooms-" + get_un.decode("utf-8"), get_chatname)
+			redis_server.rpush("user-admin-" + get_un.decode("utf-8"), get_chatname)
+			redis_server.rpush("chat-users-" + get_chatname, get_un.decode("utf-8"))
+			self.redirect("/chat?room=" + get_chatname)
 
 
 class ChatHandler(BaseHandler):
@@ -132,8 +173,8 @@ class ChatHandler(BaseHandler):
     @tornado.web.authenticated
     @only_allowed_user
     def get(self):
-        admin = is_admin(self.current_user.decode("utf-8"))
         room = self.get_argument("room")
+        admin = is_admin(self.current_user.decode("utf-8"), room)
         self.render("home.html", title="Home Page",
                     username=self.current_user, messages=append_messages(room), 
                     admin=admin, room=room, error=None)
@@ -196,7 +237,7 @@ class UserHandler(BaseHandler):
 
 		if user_exists:
 			if room in already_in_chat:
-				admin = is_admin(self.current_user.decode("utf-8"))
+				admin = is_admin(self.current_user.decode("utf-8"), room)
 				self.render("home.html", title="Home Page",
                     username=self.current_user, messages=append_messages(room), 
                     admin=admin, room=room, error="User already exists in chat")
@@ -228,7 +269,7 @@ class LoginHandler(BaseHandler):
 	'''This handler shows the login page if user is not logged in'''
 
 	def get(self):
-		next_page = self.get_argument("next", default="/enterroom")
+		next_page = self.get_argument("next", default="/")
 		if self.current_user:
 			self.redirect(next_page)
 		else:
@@ -239,7 +280,7 @@ class LoginHandler(BaseHandler):
 	def post(self):
 		get_pw = self.get_argument("password")
 		get_un = self.get_argument("username")
-		next_page = self.get_argument("next_page", default="/enterroom")
+		next_page = self.get_argument("next_page", default="/")
 
 		if redis_server.hget("user-" + get_un, "password") is None:
 			self.render("login.html", title="Login Page",
@@ -248,7 +289,7 @@ class LoginHandler(BaseHandler):
 			expected_pw = redis_server.hget("user-" + get_un, "password")
 			if get_pw == expected_pw:
 				self.set_secure_cookie("user", get_un)
-				self.redirect("/enterroom")
+				self.redirect(next_page)
 			else: 
 				self.render("login.html", title="Login Page",
 							error="password is wrong", next_page=next_page)
@@ -268,7 +309,8 @@ def make_app():
     app = Application([
    	    url(r"/", StartHandler),
         url(r"/chat", ChatHandler),
-        url(r"/enterroom", RoomHandler),
+        url(r"/joinchat", JoinChatHandler),
+        url(r"/startchat", StartChatHandler),
         url(r"/test", TestHandler),
         url(r"/message", MessageHandler),
         url(r"/deletemessages", DeleteMessagesHandler),

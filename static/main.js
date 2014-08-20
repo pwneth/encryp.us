@@ -1,11 +1,25 @@
+
+
+
 var session_password = false;
-var session_room = false;
 // var badge = 0;
 // var favicon = new Favico({
 //     animation : 'popFade'
 // });
 
 $(document).ready(function() {
+
+	function getUrlVars() {
+	    var vars = {};
+	    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+	        vars[key] = value;
+	    });
+	    return vars;
+	}
+
+	var session_room = getUrlVars()["room"];
+	sessionStorage.setItem("session_room", session_room);
+
 	//decrypt all messages function
 	function decrypt_messages() {
 		$(".msg").each(function( index ) {
@@ -74,7 +88,7 @@ $(document).ready(function() {
 				            url: "/user",
 				            data: {usertodelete: user, room: session_room},
 				            success: function(){				            
-									$("#del_user_form").slideUp(function() {
+									$("#del_user_form").hide(function() {
 										$("#del_user_form").html("");
 									});
 				            	}
@@ -86,16 +100,17 @@ $(document).ready(function() {
 		});
 	}
 
+
 	$("#menu_btn").click(function() {
 		$(".hidden_li").toggle();
 	});
 
-	$(".room_name a").click(function() {
-		console.log($(this).text());
-		var room_name = $(this).text();
-		sessionStorage.setItem("session_room", room_name);
-		sessionStorage.setItem("session_password", "false");
-	});
+	// $(".room_name a").click(function() {
+	// 	console.log($(this).text());
+	// 	var room_name = $(this).text();
+	// 	sessionStorage.setItem("session_room", room_name);
+	// 	sessionStorage.setItem("session_password", "false");
+	// });
 
 	//check if scroll bar and scroll down if
     $.fn.hasScrollBar = function() {
@@ -107,9 +122,9 @@ $(document).ready(function() {
 		session_password = sessionStorage.getItem("session_password");
 	}
 
-	if (sessionStorage.getItem("session_room")) {
-		session_room = sessionStorage.getItem("session_room");
-	}
+	// if (sessionStorage.getItem("session_room")) {
+	// 	session_room = sessionStorage.getItem("session_room");
+	// }
 
 	if ($("#chat_input")) {
 		$("#chat_input").focus();
@@ -161,11 +176,10 @@ $(document).ready(function() {
 	});
 
 	$("#add_user").click(function() {
-		$("#add_user_form").slideToggle();
+		$("#add_user_form").toggle();
 		if ($("#del_user_form").is(":visible")) {
-	    	$("#del_user_form").slideUp(function() {
-	    		$("#del_user_form").html("");
-	    	});
+	    	$("#del_user_form").hide();
+	    	$("#del_user_form").html("");
 		}
 	});
 
@@ -187,7 +201,7 @@ $(document).ready(function() {
 	            url: "/user",
 	            data: {username: username, password: password, admin: admin, room: session_room},
 	            success: function(){
-					$("#add_user_form").slideToggle();
+					$("#add_user_form").toggle();
 		            $("#add_user").effect( "highlight", {color: '#53ED6A'}, 500 );
 		            $("#new_password").val("");
 		            $("#new_username").val("");
@@ -205,6 +219,7 @@ $(document).ready(function() {
 					$.ajax({
 			            type: "POST",
 			            url: "/deletemessages",
+			            data: {room: session_room},
 			            success: function(){
 				            $("#delete_messages").effect( "highlight", {color: '#53ED6A'}, 500 );
 				            $("#messages").html("");
@@ -218,13 +233,12 @@ $(document).ready(function() {
 
 	$("#del_user").click(function() {
 		if ($("#add_user_form").is(":visible")) {
-	    	$("#add_user_form").slideUp();
+	    	$("#add_user_form").hide();
 		}
 
 		if ($("#del_user_form").is(":visible")) {
-	    	$("#del_user_form").slideUp(function() {
-	    		$("#del_user_form").html("");
-	    	});
+	    	$("#del_user_form").hide()
+	    	$("#del_user_form").html("");
 		} else {
 			$.ajax({
 				dataType: "json",
@@ -238,7 +252,7 @@ $(document).ready(function() {
 	            		$("#del_user_form").append("<div class=\"user_to_del\">"+data[i]+"</div>");
 	            	}
 	            	reload_click_del_user();			            	
-			    	$("#del_user_form").slideDown();
+			    	$("#del_user_form").show();
 	            }
 	        });
 	    } 

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+		<div id="nav">
+			<ul>
+				<li id="menu_btn">menu</li>
+				<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
+			</ul>
+		</div>
+		<div id="start_chat_container">
+			<div id="room_title">CREATE A ROOM</div>
+			<div id="new_chat">
+				<form method="POST">
+					{% if error %}
+					<div id="errors">{{ error }}</div>
+					{% end %}
+					<label for="new_chat">Room Name: </label>
+					<input id="new_chat" type="text" name="new_chat" autocomplete="off" required>
+					<input id="new_user_submit" type="submit" value="create new room">
+				</form>
+			</div>
+			<div id="room_title">CURRENT ROOMS</div>
+			<div id="room_list">
+				{% for room in room_list %}
+				<div class="room_name"><a href="/chat?room={{ room }}">{{ room }}</a></div>
+				{% end %}
+			</div>
+		</div>
+{% end %}

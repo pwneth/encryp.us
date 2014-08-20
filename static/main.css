@@ -10,7 +10,7 @@ html, body {
 }
 
 body {
-	background: #fff;
+	background: #eee;
 }
 
 #nav {
@@ -55,18 +55,22 @@ body {
 }
 
 #login_title {
+	color: #777;
 	font-size: 60px;
 	font-family: "Geo",sans-serif;
 }
 
 #login_form {
-	padding-top: 100px;
+	padding: 20px;
 	text-align: center;
-	height: 5em;
+	max-width: 350px;
+	margin: 0 auto;
+	background: #fff;
+	margin-top: 50px;
+	border: 5px solid #62ACDD;
 }
 
 #login_form form {
-	width: 350px;
 	margin: 0 auto;
 }
 
@@ -97,6 +101,93 @@ body {
 	font-family: 'Roboto Slab', serif;
 }
 
+/* CREATE CHAT STYLES */
+
+#start_chat_container {
+	text-align: center;
+	max-width: 350px;
+	margin: 0 auto;
+	font-family: 'Roboto Slab', serif;
+}
+
+#start_chat_container #new_chat {
+	border: 5px solid #C3FF45;
+	padding: 10px;
+	background: #fff;
+}
+
+#start_chat_container label {
+	display: block;
+	font-weight: 700;
+	padding-top: 10px;
+	color: #777;
+	font-size: 20px;
+}
+
+#start_chat_container input[type="text"] {
+	background: #fff;
+	border: 5px solid #C3FF45;
+	margin: 10px 0;
+	padding: 0 10px !important;
+	color: #777;
+}
+
+#start_chat_container input[type="submit"] {
+	width: 100%;
+	background: #C3FF45;
+	font-size: 20px;
+	color: #777;
+}
+
+
+/* START STYLES */
+
+#start_container {
+	text-align: center;
+	max-width: 350px;
+	margin: 0 auto;
+	font-family: 'Roboto Slab', serif;
+}
+
+#start_title {
+	padding: 50px 0 20px 0;
+	color: #777;
+	font-family: "Geo",sans-serif;
+	font-size: 40px;
+}
+
+.start_button {
+	background: #fff;
+	font-family: "Geo",sans-serif;
+	width: 100%;
+	margin-bottom: 20px;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+.start_button a {
+	font-size: 40px;
+	text-decoration: none;
+	font-weight: 700;
+	display: block;
+	width: 100%;
+	padding: 30px;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+}	
+
+#join_chat { border: 5px solid #62ACDD;}
+#join_chat a { color: #62ACDD; }
+#join_chat:hover { border-color: #1F8DD6; }
+#join_chat a:hover { color: #1F8DD6; }
+
+#start_chat { border: 5px solid #C3FF45; }
+#start_chat a { color: #C3FF45; }
+#start_chat:hover { border-color: #92BF34; }
+#start_chat a:hover { color: #92BF34; }
+
 /* ENTER ROOM STYLES */
 
 #room_container {
@@ -107,8 +198,10 @@ body {
 }
 
 #room_list {
+	background: #fff;
 	width: 100%;
 	padding: 20px;
+	margin-bottom: 20px;
 	border: #62ACDD solid 5px;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
@@ -123,13 +216,17 @@ body {
 }
 
 .room_name {
+	border-top: 5px solid #fff;
 	width: 100%;
 	background: #62ACDD;
 	font-weight: 700;
 	line-height: 30px;
-	border-top: 5px #fff solid;
 	color: #fff;
 	font-weight: 700;
+}
+
+.room_name:first-child {
+	border-top: none;
 }
 
 .room_name a {
@@ -492,5 +589,4 @@ input[type="submit"]:hover {
 		width: 100%;
 		height: 90%;
 	}
-
 }
