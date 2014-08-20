@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+		<div id="room_list">
+			{% if username %}
+				<div id="welcome_back">Welcome back, {{ username }}</div>
+			{% end %}
+				<div id="join_chat"><a href="/login">Join Chat</a></div>
+				<div id="start_chat"><a href="">Start Chat</a></div>
+		</div>
+{% end %}

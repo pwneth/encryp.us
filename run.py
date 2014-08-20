@@ -8,7 +8,7 @@ from datetime import datetime, date
 import tornado.autoreload
 import redis
 
-redis_server = redis.Redis("localhost")
+redis_server = redis.Redis(host="localhost", decode_responses=True)
 message_futures = []
 
 
@@ -23,38 +23,54 @@ class decrypt_msg(object):
 
 # loads json data and append decrypted information to an array and return
 # it for the templates to use
-def append_messages():
+def append_messages(room):
 	messages = []
-	message_data = redis_server.lrange("messages", "0", "-1")
+	message_data = redis_server.lrange("chat-messages-" + room, "0", "-1")
 
 	for f in message_data:
-		messages.append(decrypt_msg(json.loads(f.decode("utf-8"))))
+		messages.append(decrypt_msg(json.loads(f)))
 
 	return messages
 
 #function gets userlist and admin status of current_user
-def user_list():
+def user_list(room):
 	user_list = []
-	redis_user_list = redis_server.keys("user-*")
+	redis_user_list = redis_server.lrange("chat-users-" + room, "0", "-1")
 	for user in redis_user_list:
-		username = redis_server.hget(user, "username")
-		decoded_user = username.decode("utf-8")
-		user_list.append(decoded_user)
+		username = redis_server.hget("user-" + user, "username")
+		user_list.append(username)
 
 	return user_list
 
 #check if someone is admin
 def is_admin(current_user):
-	return redis_server.hget(b"user-" + current_user, "admin") == b"yes"
+	return redis_server.hget("user-" + current_user, "admin") == "yes"
 
 
 #check if admin decorator
 def only_admin(func):
 	def wrapper(self, *args, **kwargs):
-		if not is_admin(self.current_user):
+		if not is_admin(self.current_user.decode("utf-8")):
 			return "404"
 		return func(self, *args, **kwargs)
 	return wrapper
+
+#check if user is allowed in chat room
+def is_allowed_in_chat(current_user, room):
+	allowed_rooms = redis_server.lrange("user-rooms-" + current_user, "0", "-1")
+	if room in allowed_rooms:
+		return True
+	else:
+		return False
+
+#check if user is allowed in room decorator
+def only_allowed_user(func):
+	def wrapper(self, *args, **kwargs):
+		if not is_allowed_in_chat(self.current_user.decode("utf-8"), self.get_argument("room")):
+			return "404"
+		return func(self, *args, **kwargs)
+	return wrapper
+
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -64,21 +80,32 @@ class BaseHandler(tornado.web.RequestHandler):
 	def get_current_user(self):
 		return self.get_secure_cookie("user")
 
+class StartHandler(BaseHandler):
+
+	'''StartHandler lets you choose "Join Chat" or "Start a New Chat"'''
+
+	def get(self):
+		if self.current_user:
+			self.render("start.html", title="Index", username=self.current_user)
+		else:
+			self.render("start.html", title="Index", username=None)
 
 class MessageHandler(BaseHandler):
 
 	'''MessageHandler handles each message'''
 	@tornado.web.authenticated
 	@tornado.web.asynchronous
-	def get(self):
+	def post(self):
+		self.room = self.get_argument("room")
 		future = Future()
 		future.add_done_callback(self.render_now)
 		message_futures.append(future)
 
 	def render_now(self, future):
-		admin = is_admin(self.current_user)
+		admin = is_admin(self.current_user.decode("utf-8"))
 		self.render("home.html", title="Home Page",
-					username=self.current_user, messages=append_messages(), admin=admin)
+					username=self.current_user, messages=append_messages(self.room), 
+					admin=admin, room=self.room, error=None)
 
 
 class DeleteMessagesHandler(BaseHandler):
@@ -88,22 +115,38 @@ class DeleteMessagesHandler(BaseHandler):
 	def post(self):
 		redis_server.ltrim("messages", 1, 0)
 
-class MainHandler(BaseHandler):
+
+class RoomHandler(BaseHandler):
+
+	'''MainHandler shows the chat application @ home.html'''
+	@tornado.web.authenticated
+	def get(self):
+		allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
+		self.render("room.html", title="Choose Chat Room",
+					username=self.current_user, room_list=allowed_rooms)
+
+
+class ChatHandler(BaseHandler):
 
     '''MainHandler shows the chat application @ home.html'''
     @tornado.web.authenticated
+    @only_allowed_user
     def get(self):
-        admin = is_admin(self.current_user)
+        admin = is_admin(self.current_user.decode("utf-8"))
+        room = self.get_argument("room")
         self.render("home.html", title="Home Page",
-                    username=self.current_user, messages=append_messages(), admin=admin)
+                    username=self.current_user, messages=append_messages(room), 
+                    admin=admin, room=room, error=None)
 
     @tornado.web.authenticated
+    @only_allowed_user
     def post(self):
         msg = self.get_argument("message")
+        room = self.get_argument("room")
         time = datetime.now().strftime("%-I:%M %p")
 
         json_message = json.dumps({'name':self.current_user.decode("utf-8"), 'message':msg, 'time':time})
-        redis_server.rpush("messages", json_message)
+        redis_server.rpush("chat-messages-" + room, json_message)
 
         for f in message_futures:
             f.set_result(None)
@@ -122,7 +165,7 @@ class AccountHandler(BaseHandler):
 class TestHandler(BaseHandler):
 	def get(self):
 		whatever = redis_server.keys("user-*")
-
+		print(is_allowed_in_chat("michael", "hackership"))
 		messages = []
 		for f in whatever:
 			messages.append(f.decode("utf-8"))
@@ -136,7 +179,8 @@ class UserHandler(BaseHandler):
 	@tornado.web.authenticated
 	@only_admin
 	def get(self):
-		users = user_list()
+		room = self.get_argument("room")
+		users = user_list(room)
 		self.write(json.dumps(users))
 
 	@tornado.web.authenticated
@@ -145,15 +189,38 @@ class UserHandler(BaseHandler):
 		get_un = self.get_argument("username")
 		get_pw = self.get_argument("password")
 		get_admin = self.get_argument("admin")
+		room = self.get_argument("room")
 
-		redis_server.hmset("user-" + get_un, {"username":get_un, "password":get_pw, "admin":get_admin})
+		user_exists = redis_server.hget("user-" + get_un, "username")
+		already_in_chat = redis_server.lrange("user-rooms-" + get_un, "0", "-1")
+
+		if user_exists:
+			if room in already_in_chat:
+				admin = is_admin(self.current_user.decode("utf-8"))
+				self.render("home.html", title="Home Page",
+                    username=self.current_user, messages=append_messages(room), 
+                    admin=admin, room=room, error="User already exists in chat")
+			else:
+				redis_server.rpush("user-rooms-" + get_un, room)
+				redis_server.rpush("chat-users-" + room , get_un)
+				if get_admin == "yes":
+					redis_server.rpush("user-admin-" + get_un , room)	
+
+		else:
+			redis_server.hmset("user-" + get_un, {"username":get_un, "password":get_pw, "admin":get_admin})
+			redis_server.rpush("user-rooms-" + get_un, room)
+			redis_server.rpush("chat-users-" + room , get_un)
+			if get_admin == "yes":
+				redis_server.rpush("user-admin-" + get_un , room)
 
 	@tornado.web.authenticated
 	@only_admin
 	def delete(self):
 		get_un = self.get_argument("usertodelete")
+		room = self.get_argument("room")
 
-		redis_server.delete("user-" + get_un)
+		redis_server.lrem("user-rooms-" + get_un, room, num=0)
+		redis_server.lrem("chat-users-" + room, get_un, num=0)
 
 
 class LoginHandler(BaseHandler):
@@ -161,7 +228,7 @@ class LoginHandler(BaseHandler):
 	'''This handler shows the login page if user is not logged in'''
 
 	def get(self):
-		next_page = self.get_argument("next", default="/")
+		next_page = self.get_argument("next", default="/enterroom")
 		if self.current_user:
 			self.redirect(next_page)
 		else:
@@ -172,16 +239,16 @@ class LoginHandler(BaseHandler):
 	def post(self):
 		get_pw = self.get_argument("password")
 		get_un = self.get_argument("username")
-		next_page = self.get_argument("next_page", default="/")
+		next_page = self.get_argument("next_page", default="/enterroom")
 
 		if redis_server.hget("user-" + get_un, "password") is None:
 			self.render("login.html", title="Login Page",
 						error="user does not exist", next_page=next_page)
 		else:
-			expected_pw = redis_server.hget("user-" + get_un, "password").decode("utf-8")
+			expected_pw = redis_server.hget("user-" + get_un, "password")
 			if get_pw == expected_pw:
 				self.set_secure_cookie("user", get_un)
-				self.redirect(next_page)
+				self.redirect("/enterroom")
 			else: 
 				self.render("login.html", title="Login Page",
 							error="password is wrong", next_page=next_page)
@@ -199,7 +266,9 @@ class LogoutHandler(BaseHandler):
 def make_app():
     '''this is the main application function'''
     app = Application([
-        url(r"/", MainHandler),
+   	    url(r"/", StartHandler),
+        url(r"/chat", ChatHandler),
+        url(r"/enterroom", RoomHandler),
         url(r"/test", TestHandler),
         url(r"/message", MessageHandler),
         url(r"/deletemessages", DeleteMessagesHandler),
@@ -210,13 +279,11 @@ def make_app():
         template_path="templates",
         static_path="static",
         login_url="login",
-        cookie_secret="ajfhafaj8r7w73d872")
+        cookie_secret="ajfhafaj8r7w73d872",
+        debug=True)
     app.listen(8888)
-    tornado.autoreload.start()
-    tornado.autoreload.watch("static/main.js")	
-    tornado.autoreload.watch("static/main.css")
-    tornado.autoreload.watch("templates/")
     IOLoop.current().start()
+    tornado.autoreload.start()
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 var session_password = false;
-
+var session_room = false;
 // var badge = 0;
 // var favicon = new Favico({
 //     animation : 'popFade'
@@ -20,13 +20,13 @@ $(document).ready(function() {
 		});
 	}
 
-	
-
 	//load messages into messages divs
 	function load_messages(){
 		// favicon.badge(badge);
 		// badge = badge + 1;
-		$("#messages").load("/message #messages_inner", null, function() {
+		session_room = sessionStorage.getItem("session_room");
+		$("#messages").load("/message #messages_inner", {room: session_room}, function() {
+			console.log(session_room);
 			decrypt_messages();
 			setTimeout(load_messages, 0);
 			if ($("#messages").hasScrollBar()) {
@@ -72,7 +72,7 @@ $(document).ready(function() {
 						$.ajax({
 				            type: "DELETE",
 				            url: "/user",
-				            data: {usertodelete: user},
+				            data: {usertodelete: user, room: session_room},
 				            success: function(){				            
 									$("#del_user_form").slideUp(function() {
 										$("#del_user_form").html("");
@@ -86,13 +86,29 @@ $(document).ready(function() {
 		});
 	}
 
+	$("#menu_btn").click(function() {
+		$(".hidden_li").toggle();
+	});
+
+	$(".room_name a").click(function() {
+		console.log($(this).text());
+		var room_name = $(this).text();
+		sessionStorage.setItem("session_room", room_name);
+		sessionStorage.setItem("session_password", "false");
+	});
+
 	//check if scroll bar and scroll down if
     $.fn.hasScrollBar = function() {
+    // function hasScrollBar() {
         return this.get(0).scrollHeight > this.height();
     };
 
 	if (sessionStorage.getItem("session_password")) {
 		session_password = sessionStorage.getItem("session_password");
+	}
+
+	if (sessionStorage.getItem("session_room")) {
+		session_room = sessionStorage.getItem("session_room");
 	}
 
 	if ($("#chat_input")) {
@@ -101,15 +117,11 @@ $(document).ready(function() {
 
 	setTimeout(load_messages, 0);
 
-	if (!session_password && !(window.location.pathname == "/login")) {
+	if ((!session_password) && !(window.location.pathname == "/login") && !(window.location.pathname == "/enterroom")) {
 		vex_prompt();
 	} else {
 		decrypt_messages();
 	}
-
-	$("#re_enc").click(function() {
-		vex_prompt();
-	});
 
 	if (!($("#messages").hasScrollBar())) {
 		$("#messages_inner").css({
@@ -133,8 +145,8 @@ $(document).ready(function() {
 
 			$.ajax({
 	            type: "POST",
-	            url: "/",
-	            data: {message: encrypted_message},
+	            url: "/chat",
+	            data: {message: encrypted_message, room: session_room},
 	            success: function(){
 	                	$("#chat_submit").effect( "highlight", {color: '#53ED6A'}, 500 );
 						$("#chat_input").val("");
@@ -173,7 +185,7 @@ $(document).ready(function() {
 			$.ajax({
 	            type: "POST",
 	            url: "/user",
-	            data: {username: username, password: password, admin: admin},
+	            data: {username: username, password: password, admin: admin, room: session_room},
 	            success: function(){
 					$("#add_user_form").slideToggle();
 		            $("#add_user").effect( "highlight", {color: '#53ED6A'}, 500 );
@@ -204,10 +216,6 @@ $(document).ready(function() {
 		});		
 	});
 
-	$("#menu_btn").click(function() {
-		$(".hidden_li").toggle();
-	});
-
 	$("#del_user").click(function() {
 		if ($("#add_user_form").is(":visible")) {
 	    	$("#add_user_form").slideUp();
@@ -222,6 +230,7 @@ $(document).ready(function() {
 				dataType: "json",
 	            type: "GET",
 	            url: "/user",
+	            data:{room: session_room},
 	            success: function(data){
 	            	$("#del_user_form").append("<div class=\"sidebar_title\">DELETE USER</div>");
 	        		for (var i = 0; i < data.length; i++) {
@@ -234,4 +243,5 @@ $(document).ready(function() {
 	        });
 	    } 
 	});
+
 });

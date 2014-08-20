@@ -10,6 +10,7 @@ html, body {
 }
 
 body {
+	background: #fff;
 }
 
 #nav {
@@ -94,6 +95,52 @@ body {
 #errors {
 	color: red;
 	font-family: 'Roboto Slab', serif;
+}
+
+/* ENTER ROOM STYLES */
+
+#room_container {
+	text-align: center;
+	max-width: 350px;
+	margin: 0 auto;
+	font-family: 'Roboto Slab', serif;
+}
+
+#room_list {
+	width: 100%;
+	padding: 20px;
+	border: #62ACDD solid 5px;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+#room_title {
+	padding: 50px 0 20px 0;
+	color: #62ACDD;
+	font-family: "Geo",sans-serif;
+	font-size: 40px;
+}
+
+.room_name {
+	width: 100%;
+	background: #62ACDD;
+	font-weight: 700;
+	line-height: 30px;
+	border-top: 5px #fff solid;
+	color: #fff;
+	font-weight: 700;
+}
+
+.room_name a {
+	color: #fff;
+	text-decoration: none;
+	width: 100%;
+	display: block;
+}
+
+.room_name a:hover {
+	background: #1F8DD6;
 }
 
 /* CHAT STYLES */

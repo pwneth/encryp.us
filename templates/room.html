@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+		<div id="nav">
+			<ul>
+				<li id="menu_btn">menu</li>
+				<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
+			</ul>
+		</div>
+		<div id="room_container">
+			<div id="room_title">CHOOSE A ROOM</div>
+			<div id="room_list">
+				{% for room in room_list %}
+				<div class="room_name"><a href="/chat?room={{ room }}">{{ room }}</a></div>
+				{% end %}
+			</div>
+		</div>
+{% end %}
