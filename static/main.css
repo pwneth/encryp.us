@@ -67,7 +67,7 @@ body {
 	margin: 0 auto;
 	background: #fff;
 	margin-top: 50px;
-	border: 5px solid #62ACDD;
+	border-top: 5px solid #62ACDD;
 }
 
 #login_form form {
@@ -115,7 +115,7 @@ body {
 }
 
 #start_chat_container #new_chat {
-	border: 5px solid #41E843;
+	border-top: 5px solid #41E843;
 	padding: 10px;
 	background: #fff;
 }
@@ -129,8 +129,8 @@ body {
 }
 
 #start_chat_container input[type="text"] {
-	background: #fff;
-	border: 5px solid #41E843;
+	background: #eee !important;
+	border-top: 5px solid #41E843;
 	margin: 10px 0;
 	padding: 0 10px !important;
 	color: #777;
@@ -217,7 +217,7 @@ body {
 	width: 100%;
 	padding: 20px;
 	margin-bottom: 20px;
-	border: #62ACDD solid 5px;
+	border-top: #62ACDD solid 5px;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
@@ -552,6 +552,7 @@ input[type="text"], input[type="password"] {
 	height: 3em;
 	margin-top: 1em;
 	border: 5px solid #62ACDD;
+	border-width: 5px 0 0 0;
 	background-color: #eee;
 	padding-left: 1em;
 	outline: none;
@@ -584,8 +585,9 @@ input[type="submit"]:hover {
 }
 
 .vex-content {
+
 	border-radius: 0px !important;
-	border-top: 0px !important;
+	border-top: 5px solid #62ACDD !important;
 	background-color: #fff !important;
 	padding: 50px !important;
 }
@@ -593,7 +595,7 @@ input[type="submit"]:hover {
 .vex-content input[type="password"] {
 	background-color: #eee !important;
 	border-radius: 0px !important;
-	border: 0px !important;
+	border-top: 5px solid #62ACDD !important;
 }
 
 .vex-content input[type="submit"], .vex-content input[type="button"] {
@@ -601,7 +603,6 @@ input[type="submit"]:hover {
 	height: 3em !important;
 	font-size: 15px !important;
 }
-
 
 @media (max-width: 480px) {
 	#chatters {
