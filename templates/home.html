@@ -4,10 +4,11 @@
 			<div id="nav">
 				<ul>
 					<li id="menu_btn">menu</li>
+					<li id="logout" class="hidden_li"><a href="/">home</a></li>
 					<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
-					<li id="delete_messages" class="hidden_li">delete messages</li>
 					<li id="logout" class="hidden_li"><a href="/joinchat">change room</a></li>
 					{% if admin %}
+					<li id="delete_messages" class="hidden_li">delete messages</li>
 					<li id="add_user" class="hidden_li">+ user</li>
 					<li id="del_user" class="hidden_li">- user</li>
 					{% end %}
@@ -31,7 +32,7 @@
 							<input id="new_password" type="password" name="new_password" autocomplete="off">
 							<label for="new_admin">Admin?: </label>
 							<input id="new_admin" type="checkbox" name="new_admin" value="yes">
-							<input id="new_user_submit" type="submit" value="create new user">
+							<input id="new_user_submit" type="submit" value="add new user">
 						</form>	
 					</div>
 					<div id="del_user_form">

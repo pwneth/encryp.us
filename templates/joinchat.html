@@ -3,6 +3,7 @@
 		<div id="nav">
 			<ul>
 				<li id="menu_btn">menu</li>
+				<li id="logout" class="hidden_li"><a href="/">home</a></li>
 				<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
 			</ul>
 		</div>
@@ -13,6 +14,6 @@
 				<div class="room_name"><a href="/chat?room={{ room }}">{{ room }}</a></div>
 				{% end %}
 			</div>
-			<div id="start_chat" class="start_button"><a href="/login?next=startchat">Start Chat</a></div>
+			<div id="start_chat" class="start_button"><a href="/login?next=startchat">Start New Chat</a></div>
 		</div>
 {% end %}

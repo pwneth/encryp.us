@@ -3,11 +3,12 @@
 		<div id="nav">
 			<ul>
 				<li id="menu_btn">menu</li>
+				<li id="logout" class="hidden_li"><a href="/">home</a></li>
 				<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
 			</ul>
 		</div>
 		<div id="start_chat_container">
-			<div id="room_title">CREATE A ROOM</div>
+			<div id="create_room_title">CREATE A ROOM</div>
 			<div id="new_chat">
 				<form method="POST">
 					{% if error %}

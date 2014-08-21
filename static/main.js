@@ -43,9 +43,10 @@ $(document).ready(function() {
 
 	//prompt user for encryption password
 	function vex_prompt() {
+		sessionStorage.removeItem("session_password");
 		vex.dialog.prompt({
 	  		message: 'Please enter your encryption key',
-	 		placeholder: 'Try to use weird characters and numbers',
+	 		placeholder: '',
 	  		showCloseButton: false,
 	  		overlayClosesOnClick: false,
 	  		callback: function(value) {
@@ -95,18 +96,18 @@ $(document).ready(function() {
 	    return vars;
 	}
 
-	if ((sessionStorage.getItem("session_room") != getUrlVars()["room"]) && (window.location.pathname == "/chat")) {
-		if ((!session_password) && window.location.pathname == "/chat") {
-			vex_prompt();
-		} else {
-			decrypt_messages();
-		}
+	session_password = sessionStorage.getItem("session_password");
+
+	if ((sessionStorage.getItem("session_room") != getUrlVars()["room"] || !session_password) && 
+		window.location.pathname == "/chat") {
+		vex_prompt();
 	} else {
 		decrypt_messages();
 	}
 
 	var session_room = getUrlVars()["room"];
 	sessionStorage.setItem("session_room", session_room);
+
 
 
 	$("#menu_btn").click(function() {
@@ -250,7 +251,7 @@ $(document).ready(function() {
 	            url: "/user",
 	            data:{room: session_room},
 	            success: function(data){
-	            	$("#del_user_form").append("<div class=\"sidebar_title\">DELETE USER</div>");
+	            	$("#del_user_form").append("<div class=\"sidebar_title\">REMOVE USER</div>");
 	        		for (var i = 0; i < data.length; i++) {
 	            		console.log(data[i]);
 	            		$("#del_user_form").append("<div class=\"user_to_del\">"+data[i]+"</div>");
