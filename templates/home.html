@@ -3,14 +3,13 @@
 		<div id="chat">
 			<div id="nav">
 				<ul>
-					<li id="menu_btn">menu</li>
-					<li id="logout" class="hidden_li"><a href="/">home</a></li>
-					<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
-					<li id="logout" class="hidden_li"><a href="/joinchat">change room</a></li>
+					<li id="menu_btn"><i class="fa fa-bars"></i></li>
+					<li id="logout" class="hidden_li"><a href="/"><i class="fa fa-home"></i></a></li>
+					<li id="logout" class="hidden_li"><a href="/logout"><i class="fa fa-sign-out"></i></a></li>
+					<li id="logout" class="hidden_li"><a href="/joinchat"><i class="fa fa-exchange"></i> room</a></li>
+					<li id="del_user" class="hidden_li"><i class="fa fa-users"></i> users</li>
 					{% if admin %}
-					<li id="delete_messages" class="hidden_li">delete messages</li>
-					<li id="add_user" class="hidden_li">+ user</li>
-					<li id="del_user" class="hidden_li">- user</li>
+					<li id="delete_messages" class="hidden_li"><i class="fa fa-minus-square"></i> messages</li>
 					{% end %}
 				</ul>
 			</div>
@@ -21,11 +20,23 @@
 					{% end %}
 				</div>
 			</div>
-			<div id="chatters">
+			<div id="chatters">			
+				<div id="del_user_form">
+					<div class="sidebar_title">USER LIST</div>
+					{% for user in users %}
+						<div class="user_to_del">{{ user }}
+							{% if admin and user != username %}
+								<div class="user_del"><i class="fa fa-times-circle"></i></div>
+							{% end %}
+						</div>
+					{% end %}
+					{% if admin %}
+						<div id="add_user" class="sidebar_title"><i class="fa fa-plus-circle"></i> USER</div>
+					{% end %}
+				</div>
 				{% if admin %}
 					<div id="add_user_form">
 						<form method="POST">
-							<div class="sidebar_title">ADD USER</div>
 							<label for="new_username">Username: </label>
 							<input id="new_username" type="text" name="new_username" autocomplete="off">
 							<label for="new_password">Password: </label>
@@ -35,10 +46,8 @@
 							<input id="new_user_submit" type="submit" value="add new user">
 						</form>	
 					</div>
-					<div id="del_user_form">
-					</div>
 				{% end %}
-				<div id="welcome_msg">Logged in as {{ username }}. Room: {{ room }}</div>
+				
 			</div>
 			<div id="message_input">
 				<form method="POST">

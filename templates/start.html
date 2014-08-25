@@ -2,9 +2,9 @@
 {% block content %}
 		<div id="nav">
 			<ul>
-				<li id="menu_btn">menu</li>
+				<li id="menu_btn"><i class="fa fa-bars"></i></li>
 				{% if username %}
-				<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
+				<li id="logout" class="hidden_li"><a href="/logout"><i class="fa fa-sign-out"></i></a></li>
 				{% end %}
 				<li id="logout" class="hidden_li"><a href="/about">about</a></li>
 				<li id="logout" class="hidden_li"><a href="/team">team</a></li>
@@ -18,7 +18,7 @@
 			{% else %}
 				<div id="start_title">Welcome to Encrypted Chat</div>
 			{% end %}
-				<div id="join_chat" class="start_button"><a href="/login?next=joinchat">Join Chat</a></div>
-				<div id="start_chat" class="start_button"><a href="/login?next=startchat">Start New Chat</a></div>
+				<div id="join_chat" class="start_button"><a href="/login?next=joinchat"><i style="font-size: 100px" class="fa fa-comments-o"></i><br>Join Chat</a></div>
+				<div id="start_chat" class="start_button"><a href="/login?next=startchat"><i style="font-size: 100px" class="fa fa-comment-o"></i><br>Start New Chat</a></div>
 		</div>
 {% end %}

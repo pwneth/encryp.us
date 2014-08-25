@@ -64,8 +64,8 @@ $(document).ready(function() {
 
 	//allow for delete user even to be called again after users are loaded
 	function reload_click_del_user() {
-		$(".user_to_del").click(function() {
-			var user = $(this).text();
+		$(".user_del").click(function() {
+			var user = $(this).parent().text();
 			vex.dialog.confirm({
 				message: 'Are you sure you want to delete ' + user + '?',
 				callback: function(value) {
@@ -88,6 +88,12 @@ $(document).ready(function() {
 	}
 
 
+
+
+
+
+
+
 	function getUrlVars() {
 	    var vars = {};
 	    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
@@ -108,18 +114,29 @@ $(document).ready(function() {
 	var session_room = getUrlVars()["room"];
 	sessionStorage.setItem("session_room", session_room);
 
-
-
 	$("#menu_btn").click(function() {
 		$(".hidden_li").toggle();
 	});
 
-	// $(".room_name a").click(function() {
-	// 	console.log($(this).text());
-	// 	var room_name = $(this).text();
-	// 	sessionStorage.setItem("session_room", room_name);
-	// 	sessionStorage.setItem("session_password", "false");
-	// });
+	$(".admin_del").click(function() {
+		var chat = $(this).parent().text();
+		vex.dialog.confirm({
+			message: 'Are you sure you want to delete ' + chat + '?',
+			callback: function(value) {
+				if (value == true) {
+					$.ajax({
+			            type: "DELETE",
+			            url: "/deletechat",
+			            data: {chattodel: chat},
+			            success: function(){				            
+								$(this).parent().hide();
+			            	}
+			            });
+					return false;
+				}
+			}
+		});		
+	});
 
 	//check if scroll bar and scroll down if
     $.fn.hasScrollBar = function() {
@@ -181,11 +198,7 @@ $(document).ready(function() {
 	});
 
 	$("#add_user").click(function() {
-		$("#add_user_form").toggle();
-		if ($("#del_user_form").is(":visible")) {
-	    	$("#del_user_form").hide();
-	    	$("#del_user_form").html("");
-		}
+		$("#add_user_form").slideToggle();
 	});
 
 	$("#new_user_submit").click(function() {
@@ -236,31 +249,51 @@ $(document).ready(function() {
 		});		
 	});
 
-	$("#del_user").click(function() {
-		if ($("#add_user_form").is(":visible")) {
-	    	$("#add_user_form").hide();
-		}
 
+	$(".user_del").click(function() {
+		var user = $(this).parent().text();
+		vex.dialog.confirm({
+			message: 'Are you sure you want to remove ' + user + ' from the chat room?',
+			callback: function(value) {
+				if (value == true) {
+					$.ajax({
+			            type: "DELETE",
+			            url: "/user",
+			            data: {usertodelete: user, room: session_room},
+			            success: function(){				            
+								$(this).hide();
+			            	}
+			            });
+					return false;
+				}
+			}
+		});		
+	});
+
+	$("#del_user").click(function() {
 		if ($("#del_user_form").is(":visible")) {
 	    	$("#del_user_form").hide()
-	    	$("#del_user_form").html("");
 		} else {
-			$.ajax({
-				dataType: "json",
-	            type: "GET",
-	            url: "/user",
-	            data:{room: session_room},
-	            success: function(data){
-	            	$("#del_user_form").append("<div class=\"sidebar_title\">REMOVE USER</div>");
-	        		for (var i = 0; i < data.length; i++) {
-	            		console.log(data[i]);
-	            		$("#del_user_form").append("<div class=\"user_to_del\">"+data[i]+"</div>");
-	            	}
-	            	reload_click_del_user();			            	
+		// 	$.ajax({
+		// 		dataType: "json",
+	 //            type: "GET",
+	 //            url: "/user",
+	 //            data:{room: session_room},
+	 //            success: function(data){
+	 //            	$("#del_user_form").append("<div class=\"sidebar_title\">USER LIST</div>");
+	 //        		for (var i = 0; i < data.length; i++) {
+	 //            		console.log(data[i]);
+	 //            		$("#del_user_form").append("<div class=\"user_to_del\">"+data[i]+"</div>");
+	 //            	}
+	 //            	$("#del_user_form").append("<div id=\"add_user\" class=\"sidebar_title\"><i class=\"fa fa-plus-circle\"></i> USER</div>");
+	            	// reload_click_del_user();     	
 			    	$("#del_user_form").show();
-	            }
-	        });
+	    //         }
+	    //     });
 	    } 
 	});
+
+
+
 
 });

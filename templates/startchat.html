@@ -2,9 +2,9 @@
 {% block content %}
 		<div id="nav">
 			<ul>
-				<li id="menu_btn">menu</li>
-				<li id="logout" class="hidden_li"><a href="/">home</a></li>
-				<li id="logout" class="hidden_li"><a href="/logout">logout</a></li>
+				<li id="menu_btn"><i class="fa fa-bars"></i></li>
+				<li id="logout" class="hidden_li"><a href="/"><i class="fa fa-home"></i></a></li>
+				<li id="logout" class="hidden_li"><a href="/logout"><i class="fa fa-sign-out"></i></a></li>
 			</ul>
 		</div>
 		<div id="start_chat_container">
@@ -22,7 +22,11 @@
 			<div id="room_title">CURRENT ROOMS</div>
 			<div id="room_list">
 				{% for room in room_list %}
-				<div class="room_name"><a href="/chat?room={{ room }}">{{ room }}</a></div>
+				<div class="room_name"><a href="/chat?room={{ room }}">{{ room }}</a>
+					{% if room in admin_list %}
+						<div class="admin_del"><i class="fa fa-times-circle"></i></div>
+					{% end %}
+				</div>
 				{% end %}
 			</div>
 		</div>

@@ -7,13 +7,14 @@ import json
 from datetime import datetime, date
 import tornado.autoreload
 import redis
+from passlib.apps import custom_app_context as pwd_context
 
 redis_server = redis.Redis(host="localhost", decode_responses=True)
 message_futures = []
 
 
-# class decrypts the message object contents
-class decrypt_msg(object):
+# message object
+class message(object):
 
 	def __init__(self, msg):
 		self.name = msg['name']
@@ -28,7 +29,7 @@ def append_messages(room):
 	message_data = redis_server.lrange("chat-messages-" + room, "0", "-1")
 
 	for f in message_data:
-		messages.append(decrypt_msg(json.loads(f)))
+		messages.append(message(json.loads(f)))
 
 	return messages
 
@@ -106,13 +107,15 @@ class MessageHandler(BaseHandler):
 
 	def render_now(self, future):
 		admin = is_admin(self.current_user.decode("utf-8"), self.room)
+		users = user_list(self.room)
 		self.render("home.html", 
 					title="Home Page",
-					username=self.current_user, 
+					username=self.current_user.decode("utf-8"), 
 					messages=append_messages(self.room), 
 					admin=admin, 
 					room=self.room, 
-					error=None)
+					error=None,
+					users=users)
 
 
 class DeleteMessagesHandler(BaseHandler):
@@ -127,9 +130,14 @@ class DeleteChatHandler(BaseHandler):
 
 	'''DeleteChatHandler deletes a chat room if user is admin'''
 	@tornado.web.authenticated
-	def post(self):
-		room = self.get_argument("room")
-		redis_server.ltrim("chat-messages-" + room, 1, 0)
+	def delete(self):
+		room_to_delete = self.get_argument("chattodel")
+		users_in_room = redis_server.lrange("chat-users-" + room_to_delete, "0", "-1")
+		for user in users_in_room:
+			redis_server.lrem("user-rooms-" + user, room_to_delete, "0")
+			redis_server.lrem("user-admin-" + user, room_to_delete, "0")
+		redis_server.delete("chat-messages-" + room_to_delete)
+		redis_server.delete("chat-users-" + room_to_delete)
 
 
 class JoinChatHandler(BaseHandler):
@@ -138,10 +146,12 @@ class JoinChatHandler(BaseHandler):
 	@tornado.web.authenticated
 	def get(self):
 		allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
+		admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
 		self.render("joinchat.html", 
 					title="Join Chat Room",
 					username=self.current_user, 
-					room_list=allowed_rooms)
+					room_list=allowed_rooms,
+					admin_list=admin_rooms)
 
 class StartChatHandler(BaseHandler):
 
@@ -149,17 +159,20 @@ class StartChatHandler(BaseHandler):
 	@tornado.web.authenticated
 	def get(self):
 		allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
+		admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
 		self.render("startchat.html", 
 					title="Start Chat Room",
 					username=self.current_user, 
 					room_list=allowed_rooms, 
-					error=None)
+					error=None,
+					admin_list=admin_rooms)
 
 	@tornado.web.authenticated
 	def post(self):
 		get_un = self.current_user
 		get_chatname = self.get_argument("new_chat")
 		existing_rooms = redis_server.keys("chat-messages-*")
+		admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
 
 		if "chat-messages-" + get_chatname in existing_rooms:
 			error = "Room already exists"
@@ -168,7 +181,8 @@ class StartChatHandler(BaseHandler):
 						title="Start Chat Room",
 						username=self.current_user, 
 						room_list=allowed_rooms, 
-						error=error)
+						error=error,
+						admin_list=admin_rooms)
 		else:
 			time = datetime.now().strftime("%-I:%M %p")
 			message = json.dumps({'name':get_un.decode("utf-8"), 'message':'started a new chat!', 'time':time})
@@ -181,19 +195,21 @@ class StartChatHandler(BaseHandler):
 
 class ChatHandler(BaseHandler):
 
-    '''MainHandler shows the chat application @ home.html'''
+    '''ChatHandler shows the chat application @ home.html'''
     @tornado.web.authenticated
     @only_allowed_user
     def get(self):
         room = self.get_argument("room")
         admin = is_admin(self.current_user.decode("utf-8"), room)
+        users = user_list(room)
         self.render("home.html", 
         			title="Home Page",
-                    username=self.current_user, 
+                    username=self.current_user.decode("utf-8"), 
                     messages=append_messages(room), 
                     admin=admin, 
                     room=room, 
-                    error=None)
+                    error=None,
+                    users=users)
 
     @tornado.web.authenticated
     @only_allowed_user
@@ -250,6 +266,9 @@ class UserHandler(BaseHandler):
 	def post(self):
 		get_un = self.get_argument("username")
 		get_pw = self.get_argument("password")
+
+		hashed_pw = pwd_context.encrypt(get_pw)
+
 		get_admin = self.get_argument("admin")
 		room = self.get_argument("room")
 
@@ -259,13 +278,15 @@ class UserHandler(BaseHandler):
 		if user_exists:
 			if room in already_in_chat:
 				admin = is_admin(self.current_user.decode("utf-8"), room)
+				users = user_list(room)
 				self.render("home.html", 
 							title="Home Page",
-                    		username=self.current_user, 
+                    		username=self.current_user.decode("utf-8"), 
                     		messages=append_messages(room), 
                     		admin=admin, 
-                    		room=room, 
-                    		error="User already exists in chat")
+                    		room=room,
+                    		error="User already exists in chat",
+                    		users=users)
 			else:
 				redis_server.rpush("user-rooms-" + get_un, room)
 				redis_server.rpush("chat-users-" + room , get_un)
@@ -273,7 +294,7 @@ class UserHandler(BaseHandler):
 					redis_server.rpush("user-admin-" + get_un , room)	
 
 		else:
-			redis_server.hmset("user-" + get_un, {"username":get_un, "password":get_pw, "admin":get_admin})
+			redis_server.hmset("user-" + get_un, {"username":get_un, "password":hashed_pw, "admin":get_admin})
 			redis_server.rpush("user-rooms-" + get_un, room)
 			redis_server.rpush("chat-users-" + room , get_un)
 			if get_admin == "yes":
@@ -315,8 +336,9 @@ class LoginHandler(BaseHandler):
 						error="user does not exist", 
 						next_page=next_page)
 		else:
-			expected_pw = redis_server.hget("user-" + get_un, "password")
-			if get_pw == expected_pw:
+			expected_pw_hashed = redis_server.hget("user-" + get_un, "password")
+			verified_pw = pwd_context.verify(get_pw, expected_pw_hashed)
+			if verified_pw:
 				self.set_secure_cookie("user", get_un)
 				self.redirect(next_page)
 			else: 
@@ -341,6 +363,7 @@ def make_app():
    	    url(r"/", StartHandler),
         url(r"/chat", ChatHandler),
         url(r"/joinchat", JoinChatHandler),
+        url(r"/deletechat", DeleteChatHandler),
         url(r"/startchat", StartChatHandler),
         url(r"/test", TestHandler),
         url(r"/message", MessageHandler),

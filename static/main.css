@@ -13,6 +13,7 @@ body {
 	background: #eee;
 }
 
+
 #nav {
 	z-index: 10;
 	position: fixed;
@@ -143,7 +144,6 @@ body {
 	color: #fff;
 }
 
-
 /* START STYLES */
 
 #start_container {
@@ -203,6 +203,73 @@ body {
 	font-size: 50px;
 }
 
+.admin_del {
+	position: absolute;
+	z-index: 10;
+	right: 0px;
+	top: 0px;
+	width: 30px;
+	height: 30px;
+}
+
+.admin_del:hover {
+	cursor: pointer;
+	width: 92px;
+	background: #E37C7B;
+	border-radius: 15px;
+}
+
+.admin_del:hover:before {
+	content: "Delete? ";
+}
+
+/*#delete_chat {
+	font-size: 40px;
+	text-decoration: none;
+	font-weight: 700;
+	display: block;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box; 
+	box-sizing: border-box;        
+	border: 5px solid #E37C7B;
+	font-family: "Geo",sans-serif;
+	margin-bottom: 20px;
+	color: #E37C7B;
+	background: #fff;
+}
+
+#delete_chat:hover {
+	background: #E37C7B;
+	color: #fff;
+	cursor: pointer;
+	-webkit-box-shadow: inset 0px 0px 0px 5px rgba(255, 255, 255, 1);
+	-moz-box-shadow:    inset 0px 0px 0px 5px rgba(255, 255, 255, 1);
+	box-shadow:         inset 0px 0px 0px 5px rgba(255, 255, 255, 1);	
+}*/
+
+.chat_to_del {
+	width: 100%;
+	background: #E37C7B;
+	font-weight: 700;
+	line-height: 30px;
+	border-top: 5px #fff solid;
+	color: #fff;
+}
+
+.chat_to_del:hover {
+	background: #E37C7B;
+	cursor: pointer;
+}
+
+.chat_to_del:hover:after {
+	content: "?";
+}
+
+.chat_to_del:hover:before {
+	content: "Delete ";
+}
+
 /* ENTER ROOM STYLES */
 
 #room_container {
@@ -231,13 +298,15 @@ body {
 }
 
 .room_name {
-	border-top: 5px solid #fff;
+	margin-top: 5px;
 	width: 100%;
 	background: #62ACDD;
 	font-weight: 700;
 	line-height: 30px;
 	color: #fff;
 	font-weight: 700;
+	position: relative;
+	border-radius: 15px;
 }
 
 .room_name a:hover:before {
@@ -249,7 +318,7 @@ body {
 }
 
 .room_name:first-child {
-	border-top: none;
+	margin-top: none;
 }
 
 .room_name a {
@@ -257,6 +326,7 @@ body {
 	text-decoration: none;
 	width: 100%;
 	display: block;
+	border-radius: 15px;
 }
 
 .room_name a:hover {
@@ -356,7 +426,7 @@ body {
 	background: #62ACDD;
 	position: relative;
 	border-left: 5px solid #ccc;
-	overflow: none;
+	overflow-y: auto;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
@@ -382,6 +452,29 @@ body {
 	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
+.user_del {
+	position: absolute;
+	z-index: 10;
+	right: 0px;
+	top: 0px;
+	width: 30px;
+	height: 30px;
+}
+
+.user_del:hover {
+	cursor: pointer;
+	width: 104px;
+	background: #E37C7B;
+	border-radius: 15px;
+}
+
+.user_del:hover > .user_to_del {
+	text-align: left;
+}
+
+.user_del:hover:before {
+	content: "Remove? ";
+}
 
 
 #message_input {
@@ -436,6 +529,12 @@ body {
 
 
 #add_user {
+	padding-top: 10px;
+	color: #62ACDD;
+	font-family: "Geo",sans-serif;
+	font-size: 20px;
+	background: #fff;
+	text-align: center;
 }
 
 .add_user_highlighted {
@@ -487,7 +586,7 @@ body {
 }
 
 #del_user_form {
-	padding: 20px;
+	padding: 20px 20px 0 20px;
 	width: 100%;
 	margin: 0 auto;
 	display: none;
@@ -504,21 +603,10 @@ body {
 	background: #62ACDD;
 	font-weight: 700;
 	line-height: 30px;
-	border-top: 5px #fff solid;
 	color: #fff;
-}
-
-.user_to_del:hover {
-	background: #E37C7B;
-	cursor: pointer;
-}
-
-.user_to_del:hover:after {
-	content: "?";
-}
-
-.user_to_del:hover:before {
-	content: "Remove ";
+	position: relative;
+	border-radius: 15px;
+	margin-top: 5px;
 }
 
 /* FORM STYLES */
