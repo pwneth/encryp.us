@@ -30,11 +30,9 @@
 							{% end %}
 						</div>
 					{% end %}
-					{% if admin %}
-						<div id="add_user" class="sidebar_title"><i class="fa fa-plus-circle"></i> USER</div>
-					{% end %}
 				</div>
 				{% if admin %}
+					<div id="add_user" class="sidebar_title"><i class="fa fa-plus-circle"></i> USER</div>
 					<div id="add_user_form">
 						<form method="POST">
 							<label for="new_username">Username: </label>

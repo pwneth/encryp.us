@@ -529,12 +529,13 @@ body {
 
 
 #add_user {
-	padding-top: 10px;
+	padding-bottom: 20px;
 	color: #62ACDD;
 	font-family: "Geo",sans-serif;
 	font-size: 20px;
 	background: #fff;
 	text-align: center;
+	display: none;
 }
 
 .add_user_highlighted {
@@ -586,7 +587,7 @@ body {
 }
 
 #del_user_form {
-	padding: 20px 20px 0 20px;
+	padding: 20px;
 	width: 100%;
 	margin: 0 auto;
 	display: none;
