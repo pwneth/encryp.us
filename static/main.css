@@ -102,6 +102,16 @@ body {
 	font-family: 'Roboto Slab', serif;
 }
 
+#new_account {
+	padding-top: 15px;
+}
+
+#new_account a {
+	font-weight: 700;
+	color: #62ACDD;
+	font-family: 'Roboto Slab', serif;
+}
+
 /* CREATE CHAT STYLES */
 
 #chat_input {
