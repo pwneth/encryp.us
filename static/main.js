@@ -127,6 +127,16 @@ $(document).ready(function() {
 		});		
 	});
 
+	$("#account_submit").click(function() {
+		var new_account_pw = $("#account_password").val();
+		var reentered_new_account_pw = $("#account_reenter_password").val();
+		if 	(reentered_new_account_pw != new_account_pw) {
+			$("#errors").html("Passwords must match.");
+			return false;
+		}
+	});
+
+
 	//check if scroll bar and scroll down if
     $.fn.hasScrollBar = function() {
         return this.get(0).scrollHeight > this.height();

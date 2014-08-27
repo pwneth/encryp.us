@@ -21,13 +21,16 @@
 			</div>
 			<div id="room_title">CURRENT ROOMS</div>
 			<div id="room_list">
-				{% for room in room_list %}
+			{% if len(room_list) == 0 %}
+				<div class="room_name">No Rooms Available</div>
+			{% end %}
+			{% for room in room_list %}
 				<div class="room_name"><a href="/chat?room={{ room }}">{{ room }}</a>
 					{% if room in admin_list %}
 						<div class="admin_del"><i class="fa fa-times-circle"></i></div>
 					{% end %}
 				</div>
-				{% end %}
+			{% end %}
 			</div>
 		</div>
 {% end %}

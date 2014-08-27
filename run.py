@@ -123,9 +123,6 @@ class MessageHandler(BaseHandler):
     @tornado.web.asynchronous
     def post(self):
         self.room = self.get_argument("room")
-        # future = Future()
-        # future.add_done_callback(self.render_now)
-        # message_futures.append(future)
         subscriber.subscribe("new-messages-" + self.room, self)
 
     def render_now(self):
@@ -319,7 +316,7 @@ class UserHandler(BaseHandler):
                     redis_server.rpush("user-admin-" + get_un , room)   
 
         else:
-            redis_server.hmset("user-" + get_un, {"username":get_un, "password":hashed_pw, "admin":get_admin})
+            redis_server.hmset("user-" + get_un, {"username":get_un, "password":hashed_pw})
             redis_server.rpush("user-rooms-" + get_un, room)
             redis_server.rpush("chat-users-" + room , get_un)
             if get_admin == "yes":
@@ -382,6 +379,26 @@ class LogoutHandler(BaseHandler):
         self.redirect("/")
 
 
+class CreateAccountHandler(BaseHandler):
+
+    '''This handler allows users to be created'''
+    def get(self):
+        self.render("createaccount.html", title="Create Account", error=None)
+
+    def post(self):
+        get_pw = self.get_argument("password")
+        get_un = self.get_argument("username")
+
+        if redis_server.hget("user-" + get_un, "password"):
+            error = "user name already taken"
+            self.render("createaccount.html", title="Create Account", error=error)
+        else:
+            hashed_pw = pwd_context.encrypt(get_pw)
+            redis_server.hmset("user-" + get_un, {"username":get_un, "password":hashed_pw})
+            self.set_secure_cookie("user", get_un)
+            self.redirect("/startchat")
+
+
 def make_app():
     '''this is the main application function'''
     app = Application([
@@ -394,6 +411,7 @@ def make_app():
         url(r"/message", MessageHandler),
         url(r"/deletemessages", DeleteMessagesHandler),
         url(r"/user", UserHandler),
+        url(r"/createaccount", CreateAccountHandler),
         url(r"/login", LoginHandler),
         url(r"/logout", LogoutHandler)
     ],
