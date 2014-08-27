@@ -1,20 +1,26 @@
-from tornado.ioloop import IOLoop
-from tornado.concurrent import Future
-from tornado.web import RequestHandler, Application, url
-import tornado.httputil
 import base64
 import json
 from datetime import datetime, date
-import tornado.autoreload
 import redis
 import tornadoredis
 import tornadoredis.pubsub
+import tornado.httputil
+import tornado.autoreload
+from tornado.ioloop import IOLoop
+from tornado.concurrent import Future
+from tornado.web import RequestHandler, Application, url
 from passlib.apps import custom_app_context as pwd_context
+from wtforms import Form, StringField, validators
 
 redis_server = redis.Redis(host="localhost", decode_responses=True)
 c = tornadoredis.Client()
 c.connect()
 message_futures = []
+
+
+class UsernameForm(Form):
+    email = StringField('Email', [validators.Length(min=5, max=50), validators.Email()])
+    username = StringField('Username', [validators.Length(min=5, max=25)])
 
 
 # message object
@@ -260,17 +266,22 @@ class AccountHandler(BaseHandler):
                     whatever=messages)
 
 
-class TestHandler(BaseHandler):
-    def get(self):
-        whatever = redis_server.keys("user-*")
-        print(is_allowed_in_chat("michael", "hackership"))
-        messages = []
-        for f in whatever:
-            messages.append(f.decode("utf-8"))
 
-        self.render("test.html", 
-                    title="Account Page", 
-                    whatever=messages)
+class TestHandler(BaseHandler):
+
+    def get(self):
+        self.render("test.html", title="whatever", errors=None)
+
+    def post(self):
+        form = UsernameForm()
+        form.username.data = self.get_argument("username")
+        form.email.data = self.get_argument("email")
+        if form.validate():
+            self.render("test.html", title="whatever", errors="no errors!")
+        else:
+            self.render("test.html", title="whatever", errors=form.errors)
+
+
 
 
 class UserHandler(BaseHandler):

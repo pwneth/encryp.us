@@ -14,9 +14,14 @@ Should do:
  - add expiration to messages -- TTL
  - personal question to ask user upon entering for the first time --
    validated
+ - change routing of urls
 
 Necessary:
 ----------
  - change password
  - boot user
  - ssl
+ - add server side form validation
+ > - create chat
+   - create user
+   - add user
