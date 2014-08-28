@@ -21,7 +21,4 @@ Necessary:
  - change password
  - boot user
  - ssl
- - add server side form validation
- > - create chat
-   - create user
-   - add user
+ - request invite to room
