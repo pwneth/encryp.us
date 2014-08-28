@@ -98,8 +98,24 @@ body {
 }
 
 #errors {
-	color: red;
+	font-weight: 700;
+	color: #E37C7B;
 	font-family: 'Roboto Slab', serif;
+	font-size: 15px;
+	text-align: center;
+}
+
+#errors ul {
+	padding-left: 0px;
+}
+
+#errors ul li {
+	list-style: none;
+}
+
+#success {
+	color: #41E843;
+	font-weight: 700; 
 }
 
 #new_account {

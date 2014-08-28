@@ -65,8 +65,8 @@ $(document).ready(function() {
 	}
 
 	//when user_del is clicked delete the user and do the following
-	function delete_user() {
-		$(".user_del").click(function() {
+	function refresh_delete_user_click_event(selector) {
+		$(selector).click(function() {
 			var user = $(this).parent();
 			var user_txt = user.text();
 			vex.dialog.confirm({
@@ -88,6 +88,31 @@ $(document).ready(function() {
 		});
 	}
 
+
+	//deletes chat room if user is admin
+	function refresh_chat_room_del_event(selector) {
+		$(selector).click(function() {
+			var chat = $(this).parent();
+			var chat_text = chat.text();
+			vex.dialog.confirm({
+				message: 'Are you sure you want to delete ' + chat_text + '?',
+				callback: function(value) {
+					if (value == true) {
+						$.ajax({
+				            type: "DELETE",
+				            url: "/deletechat",
+				            data: {chattodel: chat_text},
+				            success: function(){				            
+									chat.slideUp("slow");
+				            	}
+				            });
+						return false;
+					}
+				}
+			});		
+		});
+	}
+
 	session_password = sessionStorage.getItem("session_password");
 
 	if ((sessionStorage.getItem("session_room") != getUrlVars()["room"] || !session_password) && 
@@ -100,40 +125,84 @@ $(document).ready(function() {
 	var session_room = getUrlVars()["room"];
 	sessionStorage.setItem("session_room", session_room);
 
+	refresh_chat_room_del_event(".admin_del")
+
+
+
+	$("#new_chat_submit").click(function() {
+		var new_chat_name = $("#new_chat_name").val();
+
+		$.ajax({
+			dataType: "json",
+            type: "POST",
+            url: "/startchat",
+            data: {new_chat: new_chat_name},
+            success: function(data){
+	            if (data.errors) {
+	            	var errors_html = "";
+	            	if (data.errors.chatname) {
+		            	for (var i = 0; i < data.errors.chatname.length; i++) {
+		            		errors_html += data.errors.chatname[i] + "<br>";
+		            	}
+		            	$("#errors").html(errors_html);
+	            	} else {
+	            		$("#errors").html(data.errors);
+	            	}
+		    	}
+		    	else {
+			        $("#room_list").append("<div style=\"display: none;\" class=\"room_name\"><a href=\"/chat?room=" + data.new_chat + "\">" + data.new_chat + "</a><div class=\"admin_del\"><i class=\"fa fa-times-circle\"></i></div></div>");
+			        $(".room_name:last-child").slideDown("slow");
+			        $("#new_chat_name").val("");
+	            	$("#success").html(data.success);
+	            	refresh_chat_room_del_event(".room_name:last-child>.admin_del");
+		    	}
+            }
+        });
+		return false;
+	});
+
 	//shows hidden menu items when menu button is clicked
 	$("#menu_btn").click(function() {
 		$(".hidden_li").toggle();
 	});
 
-	//deletes chat room if user is admin
-	$(".admin_del").click(function() {
-		var chat = $(this).parent();
-		var chat_text = chat.text();
-		vex.dialog.confirm({
-			message: 'Are you sure you want to delete ' + chat_text + '?',
-			callback: function(value) {
-				if (value == true) {
-					$.ajax({
-			            type: "DELETE",
-			            url: "/deletechat",
-			            data: {chattodel: chat_text},
-			            success: function(){				            
-								chat.slideUp("slow");
-			            	}
-			            });
-					return false;
-				}
-			}
-		});		
-	});
-
 	$("#account_submit").click(function() {
+		var new_user_name = $("#account_username").val();
 		var new_account_pw = $("#account_password").val();
 		var reentered_new_account_pw = $("#account_reenter_password").val();
-		if 	(reentered_new_account_pw != new_account_pw) {
-			$("#errors").html("Passwords must match.");
-			return false;
-		}
+
+		// if 	(reentered_new_account_pw != new_account_pw) {
+		// 	$("#errors").html("Passwords must match.");
+		// }
+
+		$.ajax({
+			dataType: "json",
+            type: "POST",
+            url: "/createaccount",
+            data: {username: new_user_name, password: new_account_pw, confirm: reentered_new_account_pw},
+            success: function(data){
+	            if (data.errors) {
+	            	console.log(data.errors);
+
+	            	var errors_html="";
+
+	            	if (typeof data.errors === "string") {
+	            		errors_html += data.errors + "<br>";
+		            } else {
+		            	for (var key in data.errors) {
+		            		for (var j = 0; j < data.errors[key].length; j++) {
+		            			errors_html += data.errors[key][j] + "<br>";
+		            		}
+		            	}
+	            	}
+
+		            $("#errors").html(errors_html);
+		    	} else if (data.redirect) {
+		    		window.location.href = data.redirect;
+		    	}
+            }
+        });
+		return false;
 	});
 
 
@@ -200,33 +269,33 @@ $(document).ready(function() {
 		});
 
 		var username = $("#new_username").val();
-		var password = $("#new_password").val();
 
 		if ($("#new_admin:checked").val()) {
 			var admin = "yes"
 		} else {
 			var admin = "no"
 		}
-		if ((username == "" || password == "") || !($.inArray(username, user_list) == -1)) {
-			$("#new_user_submit").effect( "highlight", {color: 'red'}, 1000 );
-			$("#new_user_submit").attr("value", "invalid");
-			return false;
-		} else {
-			$.ajax({
-	            type: "POST",
-	            url: "/user",
-	            data: {username: username, password: password, admin: admin, room: session_room},
-	            success: function(){
-					$("#add_user_form").toggle();
-		            $("#new_password").val("");
-		            $("#new_username").val("");
-		            $("#del_user_form").append("<div style=\"display: none;\" class=\"user_to_del\">" + username + "<div class=\"user_del\"><i class=\"fa fa-times-circle\"></i></div></div>");
-		            $(".user_to_del:last-child").slideDown("slow");
-		            delete_user()
-	            	}
-	            });
-			return false;
-		}
+
+		$.ajax({
+			dataType: "json",
+            type: "POST",
+            url: "/user",
+            data: {username: username, admin: admin, room: session_room},
+            success: function(data){
+	            if (data.error) {
+	            	$("#errors").html(data.error);
+		    	}
+		    	else {
+			        $("#del_user_form").append("<div style=\"display: none;\" class=\"user_to_del\">" + data.user + "<div class=\"user_del\"><i class=\"fa fa-times-circle\"></i></div></div>");
+			        $(".user_to_del:last-child").slideDown("slow");
+	            	refresh_delete_user_click_event(".user_to_del:last-child>.user_del");
+	            	$("#add_user_form").slideUp("slow");
+	            	$("#errors").html("");
+	            	$("#new_username").val("");
+		    	}
+            }
+        });
+		return false;
 	});
 
 	//when delete messages is clicked, do the following
@@ -249,7 +318,7 @@ $(document).ready(function() {
 		});		
 	});
 
-	delete_user()
+	refresh_delete_user_click_event(".user_del");
 
 	//shows user list
 	$("#del_user").click(function() {

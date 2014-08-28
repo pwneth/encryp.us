@@ -10,7 +10,7 @@ from tornado.ioloop import IOLoop
 from tornado.concurrent import Future
 from tornado.web import RequestHandler, Application, url
 from passlib.apps import custom_app_context as pwd_context
-from wtforms import Form, StringField, validators
+from wtforms import Form, StringField, validators, PasswordField
 
 redis_server = redis.Redis(host="localhost", decode_responses=True)
 c = tornadoredis.Client()
@@ -18,10 +18,28 @@ c.connect()
 message_futures = []
 
 
-class UsernameForm(Form):
-    email = StringField('Email', [validators.Length(min=5, max=50), validators.Email()])
-    username = StringField('Username', [validators.Length(min=5, max=25)])
+#create user validation
+class CreateUser(Form):
+    username = StringField('Username', [
+        validators.DataRequired(message="Username required"), 
+        validators.Regexp('^\w+$', message="Username must contain only letters, numbers, or underscores"),
+        validators.Length(min=5, max=25, message="Username must be betwen 5 & 25 characters")
+    ])
 
+    password = PasswordField('New Password', [
+        validators.DataRequired(message="Password required"), 
+        validators.EqualTo('confirm', message='Passwords must match')
+    ])
+
+    confirm  = PasswordField('Repeat Password')
+
+
+#create chat validation
+class CreateChat(Form):
+    chatname = StringField('Chat Name', [
+        validators.Regexp('^\w+$', message="Chat name must contain only letters numbers or underscore"),
+        validators.Length(min=5, max=25, message="Chat name must be betwen 5 & 25 characters")
+    ])
 
 # message object
 class message(object):
@@ -32,6 +50,7 @@ class message(object):
         self.msg = msg['message']
 
 
+#subscribe user to channel with pubsub and get message when sent
 class MessageSubscriber(tornadoredis.pubsub.BaseSubscriber):
 
     def on_message(self, msg):
@@ -196,28 +215,21 @@ class StartChatHandler(BaseHandler):
 
     @tornado.web.authenticated
     def post(self):
+        form = CreateChat()
         get_un = self.current_user
-        get_chatname = self.get_argument("new_chat")
+        form.chatname.data = self.get_argument("new_chat")
         existing_rooms = redis_server.keys("chat-messages-*")
         admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
 
-        if "chat-messages-" + get_chatname in existing_rooms:
-            error = "Room already exists"
-            allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
-            self.render("startchat.html", 
-                        title="Start Chat Room",
-                        username=self.current_user, 
-                        room_list=allowed_rooms, 
-                        error=error,
-                        admin_list=admin_rooms)
+        if "chat-messages-" + form.chatname.data in existing_rooms:
+            self.write(json.dumps({'errors': 'Room already exists'}))
+        elif form.validate() == False:
+            self.write(json.dumps({'errors': form.errors}))
         else:
-            time = datetime.now().strftime("%-I:%M %p")
-            message = json.dumps({'name':get_un.decode("utf-8"), 'message':'started a new chat!', 'time':time})
-            # redis_server.rpush("chat-messages-" + get_chatname, message)
-            redis_server.rpush("user-rooms-" + get_un.decode("utf-8"), get_chatname)
-            redis_server.rpush("user-admin-" + get_un.decode("utf-8"), get_chatname)
-            redis_server.rpush("chat-users-" + get_chatname, get_un.decode("utf-8"))
-            self.redirect("/chat?room=" + get_chatname)
+            redis_server.rpush("user-rooms-" + get_un.decode("utf-8"), form.chatname.data)
+            redis_server.rpush("user-admin-" + get_un.decode("utf-8"), form.chatname.data)
+            redis_server.rpush("chat-users-" + form.chatname.data, get_un.decode("utf-8"))
+            self.write(json.dumps({'new_chat': form.chatname.data, 'success': 'Chat Added to Your List!'}))
 
 
 class ChatHandler(BaseHandler):
@@ -249,10 +261,6 @@ class ChatHandler(BaseHandler):
         redis_server.rpush("chat-messages-" + room, json_message)
 
         redis_server.publish("new-messages-" + room, msg)
-        # for f in message_futures:
-        #     f.set_result(None)
-
-        # message_futures[:] = []
 
 
 class AccountHandler(BaseHandler):
@@ -264,24 +272,6 @@ class AccountHandler(BaseHandler):
                     title="Account Page", 
                     username=username, 
                     whatever=messages)
-
-
-
-class TestHandler(BaseHandler):
-
-    def get(self):
-        self.render("test.html", title="whatever", errors=None)
-
-    def post(self):
-        form = UsernameForm()
-        form.username.data = self.get_argument("username")
-        form.email.data = self.get_argument("email")
-        if form.validate():
-            self.render("test.html", title="whatever", errors="no errors!")
-        else:
-            self.render("test.html", title="whatever", errors=form.errors)
-
-
 
 
 class UserHandler(BaseHandler):
@@ -298,10 +288,6 @@ class UserHandler(BaseHandler):
     @only_admin 
     def post(self):
         get_un = self.get_argument("username")
-        get_pw = self.get_argument("password")
-
-        hashed_pw = pwd_context.encrypt(get_pw)
-
         get_admin = self.get_argument("admin")
         room = self.get_argument("room")
 
@@ -310,28 +296,16 @@ class UserHandler(BaseHandler):
 
         if user_exists:
             if room in already_in_chat:
-                admin = is_admin(self.current_user.decode("utf-8"), room)
-                users = user_list(room)
-                self.render("home.html", 
-                            title="Home Page",
-                            username=self.current_user.decode("utf-8"), 
-                            messages=append_messages(room), 
-                            admin=admin, 
-                            room=room,
-                            error="User already exists in chat",
-                            users=users)
+                self.write(json.dumps({'error': 'User already in chat'}))
             else:
                 redis_server.rpush("user-rooms-" + get_un, room)
                 redis_server.rpush("chat-users-" + room , get_un)
                 if get_admin == "yes":
-                    redis_server.rpush("user-admin-" + get_un , room)   
+                    redis_server.rpush("user-admin-" + get_un , room)
+                self.write(json.dumps({'user': get_un}))    
 
         else:
-            redis_server.hmset("user-" + get_un, {"username":get_un, "password":hashed_pw})
-            redis_server.rpush("user-rooms-" + get_un, room)
-            redis_server.rpush("chat-users-" + room , get_un)
-            if get_admin == "yes":
-                redis_server.rpush("user-admin-" + get_un , room)
+            self.write(json.dumps({'error': 'User does not exist'}))
 
     @tornado.web.authenticated
     @only_admin
@@ -390,24 +364,43 @@ class LogoutHandler(BaseHandler):
         self.redirect("/")
 
 
+class TestHandler(BaseHandler):
+
+    def get(self):
+        self.render("test.html", title="whatever", errors=None)
+
+    def post(self):
+        form = UsernameForm()
+        form.username.data = self.get_argument("username")
+        form.email.data = self.get_argument("email")
+        if form.validate():
+            self.render("test.html", title="whatever", errors="no errors!")
+        else:
+            self.render("test.html", title="whatever", errors=form.errors)
+
+
 class CreateAccountHandler(BaseHandler):
 
     '''This handler allows users to be created'''
     def get(self):
-        self.render("createaccount.html", title="Create Account", error=None)
+        self.render("createaccount.html", title="Create Account", errors=None)
 
     def post(self):
-        get_pw = self.get_argument("password")
-        get_un = self.get_argument("username")
+        form = CreateUser()
+        form.username.data = self.get_argument("username")
+        form.password.data = self.get_argument("password")
+        form.confirm.data = self.get_argument("confirm")
 
-        if redis_server.hget("user-" + get_un, "password"):
-            error = "user name already taken"
-            self.render("createaccount.html", title="Create Account", error=error)
+        if redis_server.hget("user-" + form.username.data, "password"):
+            self.write(json.dumps({'errors': 'User name already taken'}))
+        elif form.validate() == False: 
+            errors = form.errors
+            self.write(json.dumps({'errors': form.errors}))
         else:
-            hashed_pw = pwd_context.encrypt(get_pw)
-            redis_server.hmset("user-" + get_un, {"username":get_un, "password":hashed_pw})
-            self.set_secure_cookie("user", get_un)
-            self.redirect("/startchat")
+            hashed_pw = pwd_context.encrypt(form.password.data)
+            redis_server.hmset("user-" + form.username.data, {"username":form.username.data, "password":hashed_pw})
+            self.set_secure_cookie("user", form.username.data)
+            self.write(json.dumps({'redirect': '/startchat'}))
 
 
 def make_app():

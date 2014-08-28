@@ -11,12 +11,12 @@
 			<div id="create_room_title">CREATE A ROOM</div>
 			<div id="new_chat">
 				<form method="POST">
-					{% if error %}
-					<div id="errors">{{ error }}</div>
-					{% end %}
+					<div id="errors"></div>
+
+					<div id="success"></div>
 					<label for="new_chat">Room Name: </label>
-					<input id="new_chat" type="text" name="new_chat" autocomplete="off" required>
-					<input id="new_user_submit" type="submit" value="create new room">
+					<input id="new_chat_name" type="text" name="new_chat_name" autocomplete="off" required>
+					<input id="new_chat_submit" type="submit" value="create new room">
 				</form>
 			</div>
 			<div id="room_title">CURRENT ROOMS</div>
