@@ -218,14 +218,15 @@ class StartChatHandler(BaseHandler):
         form = CreateChat()
         get_un = self.current_user
         form.chatname.data = self.get_argument("new_chat")
-        existing_rooms = redis_server.keys("chat-messages-*")
+        existing_rooms = redis_server.keys("chat-users-*")
         admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
 
-        if "chat-messages-" + form.chatname.data in existing_rooms:
+        if "chat-users-" + form.chatname.data in existing_rooms:
             self.write(json.dumps({'errors': 'Room already exists'}))
         elif form.validate() == False:
             self.write(json.dumps({'errors': form.errors}))
         else:
+            time = datetime.now().strftime("%-I:%M %p")
             redis_server.rpush("user-rooms-" + get_un.decode("utf-8"), form.chatname.data)
             redis_server.rpush("user-admin-" + get_un.decode("utf-8"), form.chatname.data)
             redis_server.rpush("chat-users-" + form.chatname.data, get_un.decode("utf-8"))
@@ -340,7 +341,7 @@ class LoginHandler(BaseHandler):
         if redis_server.hget("user-" + get_un, "password") is None:
             self.render("login.html", 
                         title="Login Page",
-                        error="user does not exist", 
+                        error="User does not exist", 
                         next_page=next_page)
         else:
             expected_pw_hashed = redis_server.hget("user-" + get_un, "password")
@@ -351,7 +352,7 @@ class LoginHandler(BaseHandler):
             else: 
                 self.render("login.html", 
                             title="Login Page",
-                            error="password is wrong", 
+                            error="Password is wrong", 
                             next_page=next_page)
 
 
