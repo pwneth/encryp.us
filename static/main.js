@@ -196,7 +196,7 @@ $(document).ready(function() {
 		            	}
 	            	}
 
-		            $("#errors").html(errors_html);
+		            $("#errors_new").html(errors_html);
 		    	} else if (data.redirect) {
 		    		window.location.href = data.redirect;
 		    	}
@@ -322,11 +322,11 @@ $(document).ready(function() {
 
 	//shows user list
 	$("#del_user").click(function() {
-		if ($("#del_user_form").is(":visible")) {
-	    	$("#del_user_form").hide();
+		if ($("#users").is(":visible")) {
+	    	$("#users").hide();
 	    	$("#add_user").hide();
 		} else {	
-			$("#del_user_form").show();
+			$("#users").show();
 			$("#add_user").show();
 	    } 
 	});
