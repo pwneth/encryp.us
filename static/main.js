@@ -145,14 +145,17 @@ $(document).ready(function() {
 		            		errors_html += data.errors.chatname[i] + "<br>";
 		            	}
 		            	$("#errors").html(errors_html);
+		            	$("#success").html("");
 	            	} else {
 	            		$("#errors").html(data.errors);
+	            		$("#success").html("");
 	            	}
 		    	}
 		    	else {
-			        $("#room_list").append("<div style=\"display: none;\" class=\"room_name\"><a href=\"/chat?room=" + data.new_chat + "\">" + data.new_chat + "</a><div class=\"admin_del\"><i class=\"fa fa-times-circle\"></i></div></div>");
+			        $("#room_list").append("<div style=\"display: none;\" class=\"room_name\"><a href=\"/chat?room=" + data.new_chat + "\">" + data.new_chat + "</a><div class=\"admin_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
 			        $(".room_name:last-child").slideDown("slow");
 			        $("#new_chat_name").val("");
+			        $("#errors").html("");
 	            	$("#success").html(data.success);
 	            	refresh_chat_room_del_event(".room_name:last-child>.admin_del");
 		    	}
@@ -286,7 +289,7 @@ $(document).ready(function() {
 	            	$("#errors").html(data.error);
 		    	}
 		    	else {
-			        $("#del_user_form").append("<div style=\"display: none;\" class=\"user_to_del\">" + data.user + "<div class=\"user_del\"><i class=\"fa fa-times-circle\"></i></div></div>");
+			        $("#del_user_form").append("<div style=\"display: none;\" class=\"user_to_del\">" + data.user + "<div class=\"user_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
 			        $(".user_to_del:last-child").slideDown("slow");
 	            	refresh_delete_user_click_event(".user_to_del:last-child>.user_del");
 	            	$("#add_user_form").slideUp("slow");
@@ -325,7 +328,9 @@ $(document).ready(function() {
 		if ($("#users").is(":visible")) {
 	    	$("#users").hide();
 	    	$("#add_user").hide();
+			$("#messages").css("width", "100%");
 		} else {	
+			$("#messages").css("width", "70%");
 			$("#users").show();
 			$("#add_user").show();
 	    } 

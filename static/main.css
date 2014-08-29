@@ -15,13 +15,14 @@ body {
 
 
 #nav {
-	z-index: 1;
+	background: rgba(255,255,255,1);
+	z-index: 100;
 	position: fixed;
 	top: 0;
-	right: 0;
-	left: 0;
+	width: 100%;
 	height: 60px;
 	padding-right: 20px;
+	border-bottom: 1px solid blue;
 }
 
 #nav ul {
@@ -48,13 +49,14 @@ body {
 
 #home a:hover  {
 	text-decoration: none !important;
-	background: #000 !important;
+	background: #ccc !important;
+	border-bottom: blue 1px solid !important;
 }
 
 #nav ul li a{
 	text-decoration: none;
 	font-size: 30px;
-	color: #ccc;
+	color: blue;
 	text-align: center;
 	padding: 0 10px;
 	float: right;
@@ -66,6 +68,7 @@ body {
 }
 
 #nav ul li a:hover{
+	color: #ccc;
 	cursor: pointer;
 	border-bottom: 1px solid #ccc;
 }
@@ -79,7 +82,7 @@ body {
 #login_container {
 	max-width: 750px;
 	margin: 0 auto;
-	margin-top: 50px;
+	margin-top: 100px;
 }
 
 #login_form {
@@ -154,8 +157,7 @@ body {
 }
 
 #success {
-	color: #41E843;
-	font-weight: 700; 
+	color: blue;
 }
 
 #new_account {
@@ -171,7 +173,9 @@ body {
 /* CREATE CHAT STYLES */
 
 #chat_input {
-	border: 1px solid blue;
+	font-family: "Courier New", Courier, monospace;
+	color: blue;
+	border-top: 1px solid blue;
 	background: #fff;
 }
 
@@ -235,12 +239,24 @@ body {
 	text-align: center;
 	max-width: 350px;
 	margin: 0 auto;
-	font-family: 'Roboto Slab', serif;
+	font-family: "Courier New", Courier, monospace;
+	padding-top: 100px;
+}
+
+#login_create a{
+	color: blue;
+
+}
+
+#title {
+	color: blue;
+	font-family: "Geo",sans-serif;
+	font-size: 70px;
 }
 
 #start_title {
 	padding: 50px 0 20px 0;
-	color: #777;
+	color: blue;
 	font-family: "Geo",sans-serif;
 	font-size: 40px;
 }
@@ -357,7 +373,8 @@ body {
 
 #join_container {
 	width: 750px;
-	margin: 100px auto 0px auto;
+	margin: 0 auto;
+	padding-top: 100px;
 }
 
 #room_container {
@@ -378,7 +395,6 @@ body {
 #room_list {
 	background: #fff;
 	width: 100%;
-	border-top: blue solid 1px;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
@@ -396,17 +412,13 @@ body {
 	text-align: left;
 	margin-top: 5px;
 	width: 100%;
-	border-bottom: 1px solid blue;
+	border-top: blue solid 1px;
 	line-height: 50px;
 	color: blue;
 	position: relative;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
-}
-
-.room_name:last-child {
-	border-bottom: none;
 }
 
 .room_name a:hover:before {
@@ -493,12 +505,13 @@ body {
 }
 
 .name {
-	color: blue;
+	font-weight: 700;
+	color: #000;
 	display: inline-block;
 }
 
 .red {
-	color: red;
+	color: blue;
 }
 
 .msg {
@@ -566,6 +579,7 @@ body {
 }
 
 .user_del:hover {
+	color: red;
 	cursor: pointer;
 	border-radius: 15px;
 }
@@ -645,6 +659,7 @@ body {
 	background: rgba(255,255,255,1);
 	text-align: center;
 	padding: 20px;
+	border-bottom: 1px solid blue;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
@@ -693,15 +708,21 @@ body {
 	font-size: 30px;
 	line-height: 50px;
 	font-family: "Geo",sans-serif;
+	border-top: 1px solid blue;
 }
 
 #users {
 	display: none;
-	width: 350px;
-	position: fixed;
-	top: 80px;
-	right: 20px;
+	width: 30%;
+	float:left;
 	border: 1px solid blue;
+	border-bottom: none;
+	overflow-y: auto;
+	padding-top: 59px;
+	height: 90%;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
 .icon {
@@ -744,11 +765,13 @@ body {
 }
 
 #message_input input[type="text"] {
+	font-size: 25px;
+	font-family: "Courier New", Courier, monospace;
+	color: blue;
 	float: left;
 	width: 75%;
 	margin-top: 0;
 	height: 100%;
-	font-family: 'Roboto Slab', serif;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
@@ -789,34 +812,50 @@ input[type="submit"]:hover {
 
 /* VEX STYLES */
 
-.vex-dialog-form {
-	font-family: 'Roboto Slab', serif;
+.vex-overlay {
+	background: #fff !important;
 }
 
 .vex-dialog-message {
-    margin-bottom: 1em !important;
-    font-weight: 700 !important;
-    text-align: center !important;
+	color: blue !important;
+	display: block !important;
+	width: 100% !important;
+	text-align: left !important;
+	margin-top: 15px !important;
+	margin-bottom: 10px !important;
+	font-family: "Geo",sans-serif !important;
+	font-size: 15px !important;
 }
 
 .vex-content {
 
 	border-radius: 0px !important;
-	border-top: 5px solid #62ACDD !important;
+	border: 1px solid blue !important;
 	background-color: #fff !important;
 	padding: 50px !important;
 }
 
 .vex-content input[type="password"] {
-	background-color: #eee !important;
+	color: blue !important;
+	width: 100% !important;
+	display: block !important;
+	margin: 0px !important;
+	border: 1px solid blue !important;
+	background: #fff !important;
 	border-radius: 0px !important;
-	border-top: 5px solid #62ACDD !important;
+	font-family: "Courier New", Courier, monospace !important;
+	-webkit-box-sizing: border-box !important; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box !important;    /* Firefox, other Gecko */
+	box-sizing: border-box !important;         /* Opera/IE 8+ */
 }
 
 .vex-content input[type="submit"], .vex-content input[type="button"] {
 	font-family: "Geo",sans-serif !important;
 	height: 3em !important;
 	font-size: 15px !important;
+	background: blue !important;
+	color: #fff !important;
+	border-radius: 0px !important;
 }
 
 @media (max-width: 480px) {

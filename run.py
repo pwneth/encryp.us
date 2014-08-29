@@ -401,7 +401,7 @@ class CreateAccountHandler(BaseHandler):
             hashed_pw = pwd_context.encrypt(form.password.data)
             redis_server.hmset("user-" + form.username.data, {"username":form.username.data, "password":hashed_pw})
             self.set_secure_cookie("user", form.username.data)
-            self.write(json.dumps({'redirect': '/startchat'}))
+            self.write(json.dumps({'redirect': '/joinchat'}))
 
 
 def make_app():

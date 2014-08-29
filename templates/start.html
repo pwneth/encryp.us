@@ -2,23 +2,20 @@
 {% block content %}
 		<div id="nav">
 			<ul>
-				<li id="menu_btn"><i class="fa fa-bars"></i></li>
+				<li id="home"><a href="/">E.U</a></li>
 				{% if username %}
-				<li id="logout" class="hidden_li"><a href="/logout"><i class="fa fa-sign-out"></i></a></li>
+				<li><a href="/logout">logout</a></li>
 				{% end %}
-				<li id="logout" class="hidden_li"><a href="/about">about</a></li>
-				<li id="logout" class="hidden_li"><a href="/team">team</a></li>
-				<li id="logout" class="hidden_li"><a href="/github">github</a></li>
-				<li id="logout" class="hidden_li"><a href="/twitter">twitter</a></li>
 			</ul>
 		</div>
 		<div id="start_container">
+			<div id="title">Encryp.Us</div>
 			{% if username %}
 				<div id="start_title">Welcome back, {{ username }}</div>
+				<div id="login_create"><a href="/joinchat">Join chat</a></div>
 			{% else %}
-				<div id="start_title">Welcome to Encrypted Chat</div>
+				<div id="start_title">Welcome to Encryp.Us</div>
+				<div id="login_create"><a href="/login">Login or Create an Account</a></div>
 			{% end %}
-				<div id="join_chat" class="start_button"><a href="/login?next=joinchat"><i style="font-size: 100px" class="fa fa-comments-o"></i><br>Join Chat</a></div>
-				<div id="start_chat" class="start_button"><a href="/login?next=startchat"><i style="font-size: 100px" class="fa fa-comment-o"></i><br>Start New Chat</a></div>
 		</div>
 {% end %}
