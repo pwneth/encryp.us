@@ -90,6 +90,11 @@ def user_list(room):
 
     return user_list
 
+#function gets userlist and admin status of current_user
+def req_list(room):
+    user_list = redis_server.lrange("chat-requests-" + room, "0", "-1")
+    return user_list
+
 #check if someone is admin
 def is_admin(current_user, room):
     admin_list = redis_server.lrange("user-admin-" + current_user, "0", "-1")
@@ -118,10 +123,14 @@ def is_allowed_in_chat(current_user, room):
 def only_allowed_user(func):
     def wrapper(self, *args, **kwargs):
         if not is_allowed_in_chat(self.current_user.decode("utf-8"), self.get_argument("room")):
-            return self.redirect("/")
+            # existing_rooms = redis_server.keys("chat-users-*")
+            # room = self.get_argument("room");
+            # if room in existing_rooms:
+            #     self.render();
+
+            return self.redirect("/joinchat")
         return func(self, *args, **kwargs)
     return wrapper
-
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -131,15 +140,17 @@ class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         return self.get_secure_cookie("user")
 
+
 class StartHandler(BaseHandler):
 
     '''StartHandler lets you choose "Join Chat" or "Start a New Chat"'''
 
     def get(self):
         if self.current_user:
-            self.render("start.html", title="Index", username=self.current_user)
+            self.redirect("/joinchat")
         else:
             self.render("start.html", title="Index", username=None)
+
 
 class MessageHandler(BaseHandler):
 
@@ -153,6 +164,7 @@ class MessageHandler(BaseHandler):
     def render_now(self):
         admin = is_admin(self.current_user.decode("utf-8"), self.room)
         users = user_list(self.room)
+        requests = req_list(self.room)
         self.render("home.html", 
                     title="Home Page",
                     username=self.current_user.decode("utf-8"), 
@@ -160,7 +172,8 @@ class MessageHandler(BaseHandler):
                     admin=admin, 
                     room=self.room, 
                     error=None,
-                    users=users)
+                    users=users,
+                    requests=requests)
         subscriber.unsubscribe("new-messages-" + self.room, self)
 
 
@@ -193,25 +206,45 @@ class JoinChatHandler(BaseHandler):
     def get(self):
         allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
         admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
+        requested_chats = redis_server.lrange("user-requests-" + self.current_user.decode("utf-8"), "0", "-1")
         self.render("joinchat.html", 
                     title="Join Chat Room",
                     username=self.current_user, 
                     room_list=allowed_rooms,
+                    request_list=requested_chats,
                     admin_list=admin_rooms)
+
+
+class RequestInviteHandler(BaseHandler):
+
+    '''RequestInviteHandler allows user to request an invite to specified room'''
+    @tornado.web.authenticated
+    def post(self):
+        username = self.current_user.decode("utf-8")
+        requested_room = self.get_argument("new_request")
+        allowed_rooms = redis_server.lrange("user-rooms-" + username, "0", "-1")
+        existing_rooms = redis_server.keys("chat-users-*")
+
+        if ("chat-users-" + requested_room) in existing_rooms:
+            if requested_room in allowed_rooms:
+                self.write(json.dumps({'errors': 'You are already in the chat room'}))
+            else:
+                redis_server.lpush("user-requests-" + username, requested_room)
+                redis_server.lpush("chat-requests-" + requested_room, username)
+                self.write(json.dumps({'new_request': requested_room, 'success': 'Requested invite to ' + requested_room}))
+        else:
+            self.write(json.dumps({'errors': 'Chat does not yet exist. You can create it if you like.'}))
+
+    @tornado.web.authenticated
+    def delete(self):
+        username = self.current_user.decode("utf-8")
+        request_to_delete = self.get_argument("reqtodel")
+        redis_server.lrem("user-requests-" + username, request_to_delete, "0")
+
 
 class StartChatHandler(BaseHandler):
 
     '''StartChatHandler is called when user wants to create a new chat room'''
-    @tornado.web.authenticated
-    def get(self):
-        allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
-        admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
-        self.render("startchat.html", 
-                    title="Start Chat Room",
-                    username=self.current_user, 
-                    room_list=allowed_rooms, 
-                    error=None,
-                    admin_list=admin_rooms)
 
     @tornado.web.authenticated
     def post(self):
@@ -235,13 +268,14 @@ class StartChatHandler(BaseHandler):
 
 class ChatHandler(BaseHandler):
 
-    '''ChatHandler shows the chat application @ home.html'''
+    '''ChatHandler shows the chat room'''
     @tornado.web.authenticated
     @only_allowed_user
     def get(self):
         room = self.get_argument("room")
         admin = is_admin(self.current_user.decode("utf-8"), room)
         users = user_list(room)
+        requests = req_list(room)
         self.render("home.html", 
                     title="Home Page",
                     username=self.current_user.decode("utf-8"), 
@@ -249,7 +283,8 @@ class ChatHandler(BaseHandler):
                     admin=admin, 
                     room=room, 
                     error=None,
-                    users=users)
+                    users=users,
+                    requests=requests)
 
     @tornado.web.authenticated
     @only_allowed_user
@@ -262,17 +297,6 @@ class ChatHandler(BaseHandler):
         redis_server.rpush("chat-messages-" + room, json_message)
 
         redis_server.publish("new-messages-" + room, msg)
-
-
-class AccountHandler(BaseHandler):
-
-    '''AccountHandler allows user to edit their user info / password'''
-    @tornado.web.authenticated
-    def post(self):
-        self.render("test.html", 
-                    title="Account Page", 
-                    username=username, 
-                    whatever=messages)
 
 
 class UserHandler(BaseHandler):
@@ -336,7 +360,7 @@ class LoginHandler(BaseHandler):
     def post(self):
         get_pw = self.get_argument("password")
         get_un = self.get_argument("username")
-        next_page = self.get_argument("next_page", default="/")
+        next_page = self.get_argument("next_page", default="/joinchat")
 
         if redis_server.hget("user-" + get_un, "password") is None:
             self.render("login.html", 
@@ -383,8 +407,6 @@ class TestHandler(BaseHandler):
 class CreateAccountHandler(BaseHandler):
 
     '''This handler allows users to be created'''
-    def get(self):
-        self.render("createaccount.html", title="Create Account", errors=None)
 
     def post(self):
         form = CreateUser()
@@ -412,6 +434,7 @@ def make_app():
         url(r"/joinchat", JoinChatHandler),
         url(r"/deletechat", DeleteChatHandler),
         url(r"/startchat", StartChatHandler),
+        url(r"/request", RequestInviteHandler),
         url(r"/test", TestHandler),
         url(r"/message", MessageHandler),
         url(r"/deletemessages", DeleteMessagesHandler),

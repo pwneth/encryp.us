@@ -31,6 +31,12 @@
 					{% end %}
 				</div>
 				{% if admin %}
+					{% if len(requests) > 0 %}
+					<div class="sidebar_title">REQUESTS</div>
+						{% for user in requests %}
+							<div class="req_user">{{ user }}<div class="req_deny"><i class="icon ion-ios7-close-empty"></i></div><div class="req_accept"><i class="icon ion-ios7-checkmark-empty"></i></div></div>
+						{% end %}
+					{% end %}
 					<div id="add_user" class="sidebar_title"><i class="icon ion-ios7-plus-empty"></i> USER</div>
 					<div id="add_user_form">
 						<form method="POST">

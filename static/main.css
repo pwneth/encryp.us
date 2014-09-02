@@ -10,9 +10,13 @@ html, body {
 }
 
 body {
-	background: #fff;
+	background: url("bg.png");
 }
 
+::-webkit-input-placeholder { color:blue; opacity: 1;}
+::-moz-placeholder { color:blue; opacity: 1; } /* firefox 19+ */
+:-ms-input-placeholder { color:blue; opacity: 1; } /* ie */
+input:-moz-placeholder { color:blue; opacity: 1; }
 
 #nav {
 	background: rgba(255,255,255,1);
@@ -40,6 +44,7 @@ body {
 #home {
 	float: left;
 	background: blue;
+	text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
 }
 
 #home a {
@@ -48,8 +53,9 @@ body {
 }
 
 #home a:hover  {
+	color: blue !important;
 	text-decoration: none !important;
-	background: #ccc !important;
+	background: #fff !important;
 	border-bottom: blue 1px solid !important;
 }
 
@@ -70,19 +76,20 @@ body {
 #nav ul li a:hover{
 	color: #ccc;
 	cursor: pointer;
-	border-bottom: 1px solid #ccc;
+	border-bottom: 10px solid rgba(0,0,0,.1);
 }
 
 #login_title {
 	color: blue;
 	font-size: 40px;
 	font-family: "Geo",sans-serif;
+	padding-bottom: 10px;
 }
 
 #login_container {
 	max-width: 750px;
 	margin: 0 auto;
-	margin-top: 100px;
+	padding-top: 100px;
 }
 
 #login_form {
@@ -92,6 +99,9 @@ body {
 	float: left;
 	background: #fff;
 	border: 1px solid blue;
+	-webkit-box-shadow: 7px 7px 0px 0px rgba(0, 0, 255, 1);
+	-moz-box-shadow:    7px 7px 0px 0px rgba(0, 0, 255, 1);
+	box-shadow:         7px 7px 0px 0px rgba(0, 0, 255, 1);
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
@@ -140,23 +150,30 @@ body {
 	margin: 20px auto 0px auto;
 }
 
-#errors, #errors_new {
-	padding-top: 10px;
+#errors, #errors_new, #errors_request {
 	color: red;
 	font-family: "Courier New", Courier, monospace;
 	font-size: 15px;
 	text-align: center;
 }
 
-#errors ul, #errors_new ul {
+#errors_request {
+	padding-bottom: 10px;
+}
+
+#errors ul, #errors_new ul, #errors_request ul {
 	padding-left: 0px;
 }
 
-#errors ul li, #errors_new ul li {
+#errors ul li, #errors_new ul li, #errors_request ul li{
 	list-style: none;
 }
 
 #success {
+	color: blue;
+}
+
+#success_request {
 	color: blue;
 }
 
@@ -175,7 +192,7 @@ body {
 #chat_input {
 	font-family: "Courier New", Courier, monospace;
 	color: blue;
-	border-top: 1px solid blue;
+	border-width: 1px 0 0 0;
 	background: #fff;
 }
 
@@ -233,32 +250,45 @@ body {
 	padding: 20px;
 }
 
+#new_request_name {
+	border-width: 1px 0px 0px 0px;
+	height: 50px;
+}
+
+#new_request_submit {
+	display: none;
+}
+
 /* START STYLES */
 
 #start_container {
 	text-align: center;
-	max-width: 350px;
+	width: 100%;
 	margin: 0 auto;
 	font-family: "Courier New", Courier, monospace;
-	padding-top: 100px;
+	background: blue;
+	padding: 100px 0;
+	color: #fff;
+	border-bottom: 1px solid blue;
 }
 
 #login_create a{
-	color: blue;
+	color: #fff;
+	font-size: 25px;
 
 }
 
 #title {
-	color: blue;
 	font-family: "Geo",sans-serif;
-	font-size: 70px;
+	font-size: 150px;
+	text-shadow: 4px 4px 0px rgba(255, 255, 255, 0.5);
 }
 
 #start_title {
 	padding: 50px 0 20px 0;
-	color: blue;
 	font-family: "Geo",sans-serif;
-	font-size: 40px;
+	font-size: 50px;
+	text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
 }
 
 .start_button {
@@ -322,6 +352,24 @@ body {
 	border-radius: 15px;
 }
 
+.req_del {
+	position: absolute;
+	z-index: 10;
+	right: 0px;
+	top: 0px;
+	width: 50px;
+	height: 50px;
+	text-align: center;
+	font-size: 30px;
+	line-height: 50px;
+}
+
+.req_del:hover {
+	color: red;
+	cursor: pointer;
+	border-radius: 15px;
+}
+
 /*#delete_chat {
 	font-size: 40px;
 	text-decoration: none;
@@ -377,19 +425,23 @@ body {
 	padding-top: 100px;
 }
 
-#room_container {
+.room_container {
+	background: #fff;
 	text-align: center;
 	width: 350px;
 	float: left;
 	border: 1px solid blue;
 	font-family: "Courier New", Courier, monospace;
+	-webkit-box-shadow: 7px 7px 0px 0px rgba(0, 0, 255, 1);
+	-moz-box-shadow:    7px 7px 0px 0px rgba(0, 0, 255, 1);
+	box-shadow:         7px 7px 0px 0px rgba(0, 0, 255, 1);
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-#room_container:first-child {
-	margin-right: 50px;
+.room_container:nth-child(odd) {
+	margin: 0 50px 50px 0;
 }
 
 #room_list {
@@ -400,17 +452,70 @@ body {
 	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-#room_title {
+.room_title {
 	color: blue;
 	font-size: 30px;
 	line-height: 50px;
 	font-family: "Geo",sans-serif;
 }
 
+.req_title {
+	line-height: 30px;
+	padding-top: 10px;
+}
+
+#req_users {
+	background: #fff;
+}
+
+.req_user {
+	border-top: 1px solid blue;
+	font-family: "Courier New", Courier, monospace;
+	width: 100%;
+	line-height: 50px;
+	font-size: 15px;
+	color: blue;
+	position: relative;
+	padding-left: 20px;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+.req_deny, .req_accept {
+	position: absolute;
+	z-index: 10;
+	width: 50px;
+	height: 50px;
+	text-align: center;
+	font-size: 30px;
+	line-height: 50px;
+	top: 0px;
+}
+
+.req_deny:hover, .req_accept:hover {
+	cursor: pointer;
+}
+
+.req_accept {
+	right: 0px;
+}
+
+.req_accept:hover {
+	color: green;
+}
+
+.req_deny {
+	right: 50px;
+}
+
+.req_deny:hover {
+	color: red;
+}
+
 .room_name {
 	padding-left: 20px;
 	text-align: left;
-	margin-top: 5px;
 	width: 100%;
 	border-top: blue solid 1px;
 	line-height: 50px;
@@ -455,6 +560,7 @@ body {
 }
 
 #chat {
+	display: none;
 	width: 100%;
 	height: 100%;
 }
@@ -712,6 +818,7 @@ body {
 }
 
 #users {
+	background: #fff;
 	display: none;
 	width: 30%;
 	float:left;
@@ -786,15 +893,31 @@ body {
 }
 
 
+label {
+	color: blue;
+	display: block;
+	width: 100%;
+	text-align: left;
+	margin-top: 15px;
+	margin-bottom: 10px;
+	font-family: "Geo",sans-serif;
+	font-size: 15px;
+}
+
 input[type="text"], input[type="password"] {
 	height: 3em;
 	margin-top: 1em;
-	border: 5px solid #62ACDD;
-	border-width: 5px 0 0 0;
-	background-color: #eee;
 	padding-left: 1em;
-	outline: none;
-	font-family: 'Roboto Slab', serif;
+	color: blue;
+	width: 100%;
+	display: block;
+	margin: 0px;
+	border: 1px solid blue;
+	background: #fff;
+	font-family: "Courier New", Courier, monospace;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
 input[type="submit"] {
@@ -813,7 +936,7 @@ input[type="submit"]:hover {
 /* VEX STYLES */
 
 .vex-overlay {
-	background: #fff !important;
+	background: url("bg.png") !important;
 }
 
 .vex-dialog-message {
@@ -833,6 +956,9 @@ input[type="submit"]:hover {
 	border: 1px solid blue !important;
 	background-color: #fff !important;
 	padding: 50px !important;
+	-webkit-box-shadow: 7px 7px 0px 0px rgba(0, 0, 255, 1) !important;
+	-moz-box-shadow:    7px 7px 0px 0px rgba(0, 0, 255, 1) !important;
+	box-shadow:         7px 7px 0px 0px rgba(0, 0, 255, 1) !important;
 }
 
 .vex-content input[type="password"] {
