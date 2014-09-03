@@ -68,7 +68,23 @@ class MessageSubscriber(tornadoredis.pubsub.BaseSubscriber):
                 # for broadcasting. Thanks to Jonas Hagstedt
                 for s in subscribers:
                     s.render_now()
+        elif msg.kind == 'disconnect':
+            logging.debug("disconnected from redis. pubsub clean up.")
+
+            self.subscribers, subscribers = tornadoredis.pubsub.defaultdict(tornadoredis.pubsub.Counter), list(self.subscribers.items());
+            self.subscriber_count = tornadoredis.pubsub.Counter()
+            for channel, listeners in subscribers:
+                for subscriber in list(listeners.keys()):
+                    subscriber.render_now(close=True)
+
         super(MessageSubscriber, self).on_message(msg)
+
+
+    def _dead_close(self):
+        """
+        Unsubscribes the redis client from all subscriber.
+        Clears subscriber lists and counters.
+        """
 
 subscriber = MessageSubscriber(c)
 
@@ -166,12 +182,12 @@ class MessageHandler(BaseHandler):
         logging.debug("listening to {0}".format(self.room))
         subscriber.subscribe("new-messages-" + self.room, self)
 
-    def render_now(self):
+    def render_now(self,close=False):
         admin = is_admin(self.current_user.decode("utf-8"), self.room)
         logging.debug("rendering now {0}".format(self.room))
         users = user_list(self.room)
         requests = req_list(self.room)
-        self.render("home.html", 
+        self.render("room.html", 
                     title="Home Page",
                     username=self.current_user.decode("utf-8"), 
                     messages=append_messages(self.room), 
@@ -180,7 +196,8 @@ class MessageHandler(BaseHandler):
                     error=None,
                     users=users,
                     requests=requests)
-        subscriber.unsubscribe("new-messages-" + self.room, self)
+        if not close:
+            subscriber.unsubscribe("new-messages-" + self.room, self)
 
 
 class DeleteMessagesHandler(BaseHandler):
