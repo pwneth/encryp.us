@@ -128,7 +128,7 @@ def only_allowed_user(func):
             # if room in existing_rooms:
             #     self.render();
 
-            return self.redirect("/joinchat")
+            return self.redirect("/home")
         return func(self, *args, **kwargs)
     return wrapper
 
@@ -147,7 +147,7 @@ class StartHandler(BaseHandler):
 
     def get(self):
         if self.current_user:
-            self.redirect("/joinchat")
+            self.redirect("/home")
         else:
             self.render("start.html", title="Index", username=None)
 
@@ -199,15 +199,15 @@ class DeleteChatHandler(BaseHandler):
         redis_server.delete("chat-users-" + room_to_delete)
 
 
-class JoinChatHandler(BaseHandler):
+class HomeHandler(BaseHandler):
 
-    '''JoinChatHandler is called when user wants a join a chat they are already invited to'''
+    '''HomeHandler is the handler for room display and user functions'''
     @tornado.web.authenticated
     def get(self):
         allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
         admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
         requested_chats = redis_server.lrange("user-requests-" + self.current_user.decode("utf-8"), "0", "-1")
-        self.render("joinchat.html", 
+        self.render("home.html", 
                     title="Join Chat Room",
                     username=self.current_user, 
                     room_list=allowed_rooms,
@@ -306,8 +306,8 @@ class ChatHandler(BaseHandler):
         admin = is_admin(self.current_user.decode("utf-8"), room)
         users = user_list(room)
         requests = req_list(room)
-        self.render("home.html", 
-                    title="Home Page",
+        self.render("room.html", 
+                    title=room,
                     username=self.current_user.decode("utf-8"), 
                     messages=append_messages(room), 
                     admin=admin, 
@@ -390,7 +390,7 @@ class LoginHandler(BaseHandler):
     def post(self):
         get_pw = self.get_argument("password")
         get_un = self.get_argument("username")
-        next_page = self.get_argument("next_page", default="/joinchat")
+        next_page = self.get_argument("next_page", default="/home")
 
         if redis_server.hget("user-" + get_un, "password") is None:
             self.render("login.html", 
@@ -453,7 +453,7 @@ class CreateAccountHandler(BaseHandler):
             hashed_pw = pwd_context.encrypt(form.password.data)
             redis_server.hmset("user-" + form.username.data, {"username":form.username.data, "password":hashed_pw})
             self.set_secure_cookie("user", form.username.data)
-            self.write(json.dumps({'redirect': '/joinchat'}))
+            self.write(json.dumps({'redirect': '/home'}))
 
 
 def make_app():
@@ -461,7 +461,7 @@ def make_app():
     app = Application([
         url(r"/", StartHandler),
         url(r"/chat", ChatHandler),
-        url(r"/joinchat", JoinChatHandler),
+        url(r"/home", HomeHandler),
         url(r"/deletechat", DeleteChatHandler),
         url(r"/startchat", StartChatHandler),
         url(r"/request", RequestInviteHandler),
