@@ -251,7 +251,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 #new_request_name {
-	border-width: 1px 0px 0px 0px;
+	border-width: 1px 0px;
 	height: 50px;
 }
 
@@ -469,12 +469,12 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 .req_user {
-	border-top: 1px solid blue;
+	color: #aaa;
+	border-bottom: 1px solid blue;
 	font-family: "Courier New", Courier, monospace;
 	width: 100%;
 	line-height: 50px;
 	font-size: 15px;
-	color: blue;
 	position: relative;
 	padding-left: 20px;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -483,6 +483,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 .req_deny, .req_accept {
+	color: blue;
 	position: absolute;
 	z-index: 10;
 	width: 50px;
@@ -502,7 +503,8 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 .req_accept:hover {
-	color: green;
+	color: #fff;
+	background: green;
 }
 
 .req_deny {
@@ -510,7 +512,8 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 .req_deny:hover {
-	color: red;
+	color: #fff;
+	background: red;
 }
 
 .room_name {
@@ -814,7 +817,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	font-size: 30px;
 	line-height: 50px;
 	font-family: "Geo",sans-serif;
-	border-top: 1px solid blue;
+	border-bottom: 1px solid blue;
 }
 
 #users {
@@ -847,7 +850,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 .user_to_del {
-	border-top: 1px solid blue;
+	border-bottom: 1px solid blue;
 	font-family: "Courier New", Courier, monospace;
 	width: 100%;
 	line-height: 50px;
@@ -859,10 +862,6 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
-}
-
-.user_to_del:last-child {
-	border-bottom: 1px solid blue;
 }
 
 /* FORM STYLES */

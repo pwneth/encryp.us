@@ -240,6 +240,36 @@ class RequestInviteHandler(BaseHandler):
         username = self.current_user.decode("utf-8")
         request_to_delete = self.get_argument("reqtodel")
         redis_server.lrem("user-requests-" + username, request_to_delete, "0")
+        redis_server.lrem("chat-requests-" + request_to_delete, username, "0")
+
+class InviteHandler(BaseHandler):
+
+    '''RequestInviteHandler allows user to request an invite to specified room'''
+    @tornado.web.authenticated
+    @only_admin
+    def post(self):
+        get_un = self.get_argument("username")
+        get_admin = self.get_argument("admin")
+        room = self.get_argument("room")
+
+        user_exists = redis_server.hget("user-" + get_un, "username")
+        already_in_chat = redis_server.lrange("user-rooms-" + get_un, "0", "-1")
+
+        redis_server.rpush("user-rooms-" + get_un, room)
+        redis_server.rpush("chat-users-" + room , get_un)
+        redis_server.lrem("chat-requests-" + room, get_un)
+        redis_server.lrem("user-requests-" + get_un, room)
+        if get_admin == "yes":
+            redis_server.rpush("user-admin-" + get_un , room)
+        self.write(json.dumps({'user': get_un}))    
+
+    @tornado.web.authenticated
+    @only_admin
+    def delete(self):
+        get_un = self.get_argument("username")
+        room = self.get_argument("room")
+        redis_server.lrem("chat-requests-" + room, get_un)
+        redis_server.lrem("user-requests-" + get_un, room)
 
 
 class StartChatHandler(BaseHandler):
@@ -435,6 +465,7 @@ def make_app():
         url(r"/deletechat", DeleteChatHandler),
         url(r"/startchat", StartChatHandler),
         url(r"/request", RequestInviteHandler),
+        url(r"/invite", InviteHandler),
         url(r"/test", TestHandler),
         url(r"/message", MessageHandler),
         url(r"/deletemessages", DeleteMessagesHandler),

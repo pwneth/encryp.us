@@ -139,6 +139,111 @@ $(document).ready(function() {
 		});
 	}
 
+	function new_user_submit() {
+			//add user form is submitted, do the following
+		$("#add_user_submit").click(function() {
+			var user_list = [];
+			$(".user_to_del").each(function() {
+				user_list.push($(this).text().trim());
+			});
+
+			var username = $("#new_username").val();
+
+			if ($("#new_admin:checked").val()) {
+				var admin = "yes"
+			} else {
+				var admin = "no"
+			}
+
+			$.ajax({
+				dataType: "json",
+	            type: "POST",
+	            url: "/user",
+	            data: {username: username, admin: admin, room: session_room},
+	            success: function(data){
+		            if (data.error) {
+		            	$("#errors").html(data.error);
+			    	}
+			    	else {
+				        $("#del_user_form").append("<div style=\"display: none;\" class=\"user_to_del\">" + data.user + "<div class=\"user_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
+				        $(".user_to_del:last-child").slideDown("slow");
+		            	refresh_delete_user_click_event(".user_to_del:last-child>.user_del");
+		            	$("#add_user_form").slideUp("slow");
+		            	$("#errors").html("");
+		            	$("#new_username").val("");
+			    	}
+	            }
+	        });
+			return false;
+		});
+	}
+
+	function request_accept(selector) {
+			//add user form is submitted, do the following
+		$(selector).click(function() {
+			// var user_list = [];
+			// $(".user_to_del").each(function() {
+			// 	user_list.push($(this).text().trim());
+			// });
+			var username_box = $(this).parent();
+			var username = username_box.text();
+			var admin = "no";
+
+			// if ($("#new_admin:checked").val()) {
+			// 	var admin = "yes"
+			// } else {
+			// 	var admin = "no"
+			// }
+
+			$.ajax({
+				dataType: "json",
+	            type: "POST",
+	            url: "/invite",
+	            data: {username: username, admin: admin, room: session_room},
+	            success: function(data){
+		            if (data.error) {
+		            	$("#errors").html(data.error);
+			    	}
+			    	else {
+				        $("#allowed_users").append("<div style=\"display: none;\" class=\"user_to_del\">" + data.user + "<div class=\"user_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
+				        $(".user_to_del:last-child").slideDown("slow");
+		            	refresh_delete_user_click_event(".user_to_del:last-child>.user_del");
+		            	$("#add_user_form").slideUp("slow");
+		            	$("#errors").html("");
+		            	$("#new_username").val("");
+		            	username_box.slideUp("slow");
+			    	}
+	            }
+	        });
+			return false;
+		});
+	}
+
+
+	function request_reject(selector) {
+		$(selector).click(function() {
+			var username_box = $(this).parent();
+			var username = username_box.text();
+
+			vex.dialog.confirm({
+				message: 'Are you sure you want to reject ' + username + '\'s invite request?',
+				callback: function(value) {
+					if (value == true) {
+						$.ajax({
+				            type: "DELETE",
+				            url: "/invite",
+				            data: {username: username, room: session_room},
+				            success: function(){				            
+									username_box.slideUp("slow");
+				            	}
+				            });
+						return false;
+					}
+				}
+			});
+		});
+	}
+
 	session_password = sessionStorage.getItem("session_password");
 
 	if ((sessionStorage.getItem("session_room") != getUrlVars()["room"] || !session_password) && 
@@ -207,7 +312,11 @@ $(document).ready(function() {
 	            	$("#success_request").html("");
 		    	}
 		    	else {
-			        $("#request_list").append("<div style=\"display: none;\" class=\"room_name\">" + data.new_request + "<div class=\"req_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
+		    		if (!($("#pending_invites").text())) {
+		    			$("#request_list").append("<div style=\"display:none;\" id=\"pending_invites\" class=\"room_title\">PENDING INVITES</div>"	);
+		    			$("#pending_invites").slideDown("slow");
+		    		}
+			        $("#request_list").append("<div style=\"display:none;\" class=\"room_name\">" + data.new_request + "<div class=\"req_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
 			        $("#request_list .room_name:last-child").slideDown("slow");
 			        $("#new_request_name").val("");
 			        $("#errors_request").html("");
@@ -319,42 +428,7 @@ $(document).ready(function() {
 		$("#add_user_form").slideToggle();
 	});
 
-	//add user form is submitted, do the following
-	$("#new_user_submit").click(function() {
-		var user_list = [];
-		$(".user_to_del").each(function() {
-			user_list.push($(this).text().trim());
-		});
-
-		var username = $("#new_username").val();
-
-		if ($("#new_admin:checked").val()) {
-			var admin = "yes"
-		} else {
-			var admin = "no"
-		}
-
-		$.ajax({
-			dataType: "json",
-            type: "POST",
-            url: "/user",
-            data: {username: username, admin: admin, room: session_room},
-            success: function(data){
-	            if (data.error) {
-	            	$("#errors").html(data.error);
-		    	}
-		    	else {
-			        $("#del_user_form").append("<div style=\"display: none;\" class=\"user_to_del\">" + data.user + "<div class=\"user_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
-			        $(".user_to_del:last-child").slideDown("slow");
-	            	refresh_delete_user_click_event(".user_to_del:last-child>.user_del");
-	            	$("#add_user_form").slideUp("slow");
-	            	$("#errors").html("");
-	            	$("#new_username").val("");
-		    	}
-            }
-        });
-		return false;
-	});
+	new_user_submit();
 
 	//when delete messages is clicked, do the following
 	$("#delete_messages").click(function() {
@@ -377,6 +451,8 @@ $(document).ready(function() {
 	});
 
 	refresh_delete_user_click_event(".user_del");
+	request_accept(".req_accept");
+	request_reject(".req_deny")
 
 	//shows user list
 	$("#del_user").click(function() {
