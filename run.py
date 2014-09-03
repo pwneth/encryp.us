@@ -11,6 +11,9 @@ from tornado.concurrent import Future
 from tornado.web import RequestHandler, Application, url
 from passlib.apps import custom_app_context as pwd_context
 from wtforms import Form, StringField, validators, PasswordField
+import logging
+
+logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
 
 redis_server = redis.Redis(host="localhost", decode_responses=True)
 c = tornadoredis.Client()
@@ -55,6 +58,7 @@ class MessageSubscriber(tornadoredis.pubsub.BaseSubscriber):
 
     def on_message(self, msg):
         if not msg:
+            logging.debug("no message")
             return
         if msg.kind == 'message' and msg.body:
             # Get the list of subscribers for this channel
@@ -159,10 +163,12 @@ class MessageHandler(BaseHandler):
     @tornado.web.asynchronous
     def post(self):
         self.room = self.get_argument("room")
+        logging.debug("listening to {0}".format(self.room))
         subscriber.subscribe("new-messages-" + self.room, self)
 
     def render_now(self):
         admin = is_admin(self.current_user.decode("utf-8"), self.room)
+        logging.debug("rendering now {0}".format(self.room))
         users = user_list(self.room)
         requests = req_list(self.room)
         self.render("home.html", 

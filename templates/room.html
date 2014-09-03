@@ -2,7 +2,7 @@
 {% block content %}
 		<div id="nav">
 			<ul>
-				<li id="home"><a href="/home">E.U</a></li>
+				<li id="home"><a href="/joinchat">E.U</a></li>
 				<li><a href="/logout">logout</a></li>
 				<li><a href="/home">rooms</a></li>
 				<li id="del_user"><a>users</a></li>
@@ -37,7 +37,9 @@
 						<div class="req_user">{{ user }}<div class="req_deny"><i class="icon ion-ios7-close-empty"></i></div><div class="req_accept"><i class="icon ion-ios7-checkmark-empty"></i></div></div>
 					{% end %}
 					</div>
+				{% end %}
 				</div>
+				{% if admin %}
 					<div id="add_user" class="sidebar_title"><i class="icon ion-ios7-plus-empty"></i> USER</div>
 					<div id="add_user_form">
 						<form method="POST">
