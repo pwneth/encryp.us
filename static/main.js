@@ -33,7 +33,11 @@ $(document).ready(function() {
 	//load messages into messages divs
 	function load_messages(){
 		session_room = sessionStorage.getItem("session_room");
-		$("#messages").load("/message #messages_inner", {room: session_room}, function() {
+		$("#messages").load("/message #messages_inner", {room: session_room}, function(txt, status, xhr) {
+			if (xhr.status == 401) {
+				window.location.href = "/home";
+				return false;
+			}
 			console.log(session_room);
 			decrypt_messages();
 			setTimeout(load_messages, 0);
@@ -153,44 +157,6 @@ $(document).ready(function() {
 		});
 	}
 
-	function new_user_submit() {
-			//add user form is submitted, do the following
-		$("#add_user_submit").click(function() {
-			var user_list = [];
-			$(".user_to_del").each(function() {
-				user_list.push($(this).text().trim());
-			});
-
-			var username = $("#new_username").val();
-
-			if ($("#new_admin:checked").val()) {
-				var admin = "yes"
-			} else {
-				var admin = "no"
-			}
-
-			$.ajax({
-				dataType: "json",
-	            type: "POST",
-	            url: "/user",
-	            data: {username: username, admin: admin, room: session_room},
-	            success: function(data){
-		            if (data.error) {
-		            	$("#errors").html(data.error);
-			    	}
-			    	else {
-				        $("#del_user_form").append("<div style=\"display: none;\" class=\"user_to_del\">" + data.user + "<div class=\"user_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
-				        $(".user_to_del:last-child").slideDown("slow");
-		            	refresh_delete_user_click_event(".user_to_del:last-child>.user_del");
-		            	$("#add_user_form").slideUp("slow");
-		            	$("#errors").html("");
-		            	$("#new_username").val("");
-			    	}
-	            }
-	        });
-			return false;
-		});
-	}
 
 	function request_accept(selector) {
 			//add user form is submitted, do the following
@@ -358,6 +324,43 @@ $(document).ready(function() {
 	}
 
 
+	//add user form is submitted, do the following
+	$("#new_user_submit").click(function() {
+		var user_list = [];
+		$(".user_to_del").each(function() {
+			user_list.push($(this).text().trim());
+		});
+
+		var username = $("#new_username").val();
+
+		if ($("#new_admin:checked").val()) {
+			var admin = "yes"
+		} else {
+			var admin = "no"
+		}
+
+		$.ajax({
+			dataType: "json",
+            type: "POST",
+            url: "/user",
+            data: {username: username, admin: admin, room: session_room},
+            success: function(data){
+	            if (data.error) {
+	            	$("#errors").html(data.error);
+		    	}
+		    	else {
+			        $("#del_user_form").append("<div style=\"display: none;\" class=\"user_to_del\">" + data.user + "<div class=\"user_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
+			        $(".user_to_del:last-child").slideDown("slow");
+	            	refresh_delete_user_click_event(".user_to_del:last-child>.user_del");
+	            	$("#add_user_form").slideUp("slow");
+	            	$("#errors").html("");
+	            	$("#new_username").val("");
+		    	}
+            }
+        });
+		return false;
+	});
+
 
 	$("#new_chat_submit").click(function() {
 		var new_chat_name = $("#new_chat_name").val();
@@ -464,8 +467,6 @@ $(document).ready(function() {
 	$("#add_user").click(function() {
 		$("#add_user_form").slideToggle();
 	});
-
-	new_user_submit();
 
 	//when delete messages is clicked, do the following
 	$("#delete_messages").click(function() {

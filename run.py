@@ -178,9 +178,12 @@ class MessageHandler(BaseHandler):
     @tornado.web.authenticated
     @tornado.web.asynchronous
     def post(self):
-        self.room = self.get_argument("room")
-        logging.debug("listening to {0}".format(self.room))
-        subscriber.subscribe("new-messages-" + self.room, self)
+        if not is_allowed_in_chat(self.current_user.decode("utf-8"), self.get_argument("room")):
+            self.send_error(status_code=401)
+        else:
+            self.room = self.get_argument("room")
+            logging.debug("listening to {0}".format(self.room))
+            subscriber.subscribe("new-messages-" + self.room, self)
 
     def render_now(self,close=False):
         admin = is_admin(self.current_user.decode("utf-8"), self.room)
@@ -390,9 +393,9 @@ class UserHandler(BaseHandler):
     def delete(self):
         get_un = self.get_argument("usertodelete")
         room = self.get_argument("room")
-
         redis_server.lrem("user-rooms-" + get_un, room, num=0)
         redis_server.lrem("chat-users-" + room, get_un, num=0)
+        redis_server.publish("new-messages-" + room, '1')
 
 
 class LoginHandler(BaseHandler):
@@ -426,7 +429,7 @@ class LoginHandler(BaseHandler):
                 self.write(json.dumps({'redirect': next_page}))
             else: 
                 self.write(json.dumps({'errors': 'Password is wrong'}))
-                
+
 
 class LogoutHandler(BaseHandler):
 
