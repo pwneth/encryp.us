@@ -1,5 +1,11 @@
 var session_password = false;
 
+function imgError(image) {
+    image.onerror = "";
+    image.src = "/static/broken.jpg";
+    return true;
+}
+
 $(document).ready(function() {
 
 	//decrypt all messages function
@@ -8,7 +14,15 @@ $(document).ready(function() {
 			var encrypted_content = $(this).data("msg");
 			var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, session_password));
 			if (decrypted_content.substr(0,session_password.length) == session_password) {
-				$(this).text(decrypted_content.substr(session_password.length)).linkify();
+				var msg_data = decrypted_content.substr(session_password.length);
+				if (msg_data.substr(msg_data.length - 4 ) == ".jpg" || 
+					msg_data.substr(msg_data.length - 4 ) == ".gif" ||
+					msg_data.substr(msg_data.length - 4 ) == ".png" ||
+					msg_data.substr(msg_data.length - 5 ) == ".jpeg") {
+					$(this).html("<a href=\"" + msg_data + "\"><img class=\"chat_img\" onerror=\"imgError(this);\" src=\"" + msg_data + "\"></a>");
+				} else {
+					$(this).text(msg_data).linkify();
+				}
 			} else {
 				vex_prompt();
 				return false;
@@ -50,7 +64,7 @@ $(document).ready(function() {
 					sessionStorage.setItem("session_password", value);
 					session_password = sessionStorage.getItem("session_password");
 					decrypt_messages();
-					$("#chat").show();
+					$("#messages").show();
 					$("#chat_input").focus();
 				}
 	 		}
@@ -244,14 +258,82 @@ $(document).ready(function() {
 		});
 	}
 
+	$("#login_submit").click(function() {
+		var username = $("#username").val();
+		var password = $("#password").val();
+		var next = getUrlVars()["next"]
+
+		$.ajax({
+			dataType: "json",
+            type: "POST",
+            url: "/login",
+            data: {username: username, password: password, next:next},
+            success: function(data){
+	            if (data.errors) {
+	            	console.log(data.errors);
+		            $("#errors").html(data.errors);
+		    	} else if (data.redirect) {
+		    		decoded_url = decodeURIComponent(data.redirect);
+		    		window.location.pathname = decoded_url;
+		    	}
+            }
+        });
+		return false;
+	});
+
+	$("#account_submit").click(function() {
+		var new_user_name = $("#account_username").val();
+		var new_account_pw = $("#account_password").val();
+		var reentered_new_account_pw = $("#account_reenter_password").val();
+
+		// if 	(reentered_new_account_pw != new_account_pw) {
+		// 	$("#errors").html("Passwords must match.");
+		// }
+
+		$.ajax({
+			dataType: "json",
+            type: "POST",
+            url: "/createaccount",
+            data: {username: new_user_name, password: new_account_pw, confirm: reentered_new_account_pw},
+            success: function(data){
+	            if (data.errors) {
+	            	console.log(data.errors);
+
+	            	var errors_html="";
+
+	            	if (typeof data.errors === "string") {
+	            		errors_html += data.errors + "<br>";
+		            } else {
+		            	for (var key in data.errors) {
+		            		for (var j = 0; j < data.errors[key].length; j++) {
+		            			errors_html += data.errors[key][j] + "<br>";
+		            		}
+		            	}
+	            	}
+
+		            $("#errors_new").html(errors_html);
+		    	} else if (data.redirect) {
+		    		window.location.href = data.redirect;
+		    	}
+            }
+        });
+		return false;
+	});
+
+
+	//check if scroll bar and scroll down if
+    $.fn.hasScrollBar = function() {
+        return this.get(0).scrollHeight > this.height();
+    };
+
 	session_password = sessionStorage.getItem("session_password");
 
 	if ((sessionStorage.getItem("session_room") != getUrlVars()["room"] || !session_password) && 
 		window.location.pathname == "/chat") {
 		vex_prompt();
 	} else {
+		$("#messages").show();
 		decrypt_messages();
-		$("#chat").show();
 	}
 
 	var session_room = getUrlVars()["room"];
@@ -259,6 +341,22 @@ $(document).ready(function() {
 
 	refresh_chat_room_del_event(".admin_del")
 	refresh_request_del_event(".req_del")
+
+
+    //focus on chat input when in chat window
+	$("#chat_input").focus();
+
+	//load messages on page load into chat area
+	setTimeout(load_messages, 0);
+
+	//if messages div has a scroll bar position the div accordingly
+	if (!($("#messages").hasScrollBar())) {
+		$("#messages_inner").css({
+			top: "auto",
+			bottom: 0
+		});
+	}
+
 
 
 	$("#new_chat_submit").click(function() {
@@ -332,67 +430,6 @@ $(document).ready(function() {
 	$("#menu_btn").click(function() {
 		$(".hidden_li").toggle();
 	});
-
-	$("#account_submit").click(function() {
-		var new_user_name = $("#account_username").val();
-		var new_account_pw = $("#account_password").val();
-		var reentered_new_account_pw = $("#account_reenter_password").val();
-
-		// if 	(reentered_new_account_pw != new_account_pw) {
-		// 	$("#errors").html("Passwords must match.");
-		// }
-
-		$.ajax({
-			dataType: "json",
-            type: "POST",
-            url: "/createaccount",
-            data: {username: new_user_name, password: new_account_pw, confirm: reentered_new_account_pw},
-            success: function(data){
-	            if (data.errors) {
-	            	console.log(data.errors);
-
-	            	var errors_html="";
-
-	            	if (typeof data.errors === "string") {
-	            		errors_html += data.errors + "<br>";
-		            } else {
-		            	for (var key in data.errors) {
-		            		for (var j = 0; j < data.errors[key].length; j++) {
-		            			errors_html += data.errors[key][j] + "<br>";
-		            		}
-		            	}
-	            	}
-
-		            $("#errors_new").html(errors_html);
-		    	} else if (data.redirect) {
-		    		window.location.href = data.redirect;
-		    	}
-            }
-        });
-		return false;
-	});
-
-
-	//check if scroll bar and scroll down if
-    $.fn.hasScrollBar = function() {
-        return this.get(0).scrollHeight > this.height();
-    };
-
-    //focus on chat input when in chat window
-	if ($("#chat_input")) {
-		$("#chat_input").focus();
-	}
-
-	//load messages on page load into chat area
-	setTimeout(load_messages, 0);
-
-	//if messages div has a scroll bar position the div accordingly
-	if (!($("#messages").hasScrollBar())) {
-		$("#messages_inner").css({
-			top: "auto",
-			bottom: 0
-		});
-	}
 
 	//scroll message div to bottom when message is received 
 	var messageDiv = document.getElementById("messages");

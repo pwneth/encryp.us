@@ -413,25 +413,20 @@ class LoginHandler(BaseHandler):
     def post(self):
         get_pw = self.get_argument("password")
         get_un = self.get_argument("username")
-        next_page = self.get_argument("next_page", default="/home")
+        next_page = self.get_argument("next", default="/")
+        print(next_page)
 
         if redis_server.hget("user-" + get_un, "password") is None:
-            self.render("login.html", 
-                        title="Login Page",
-                        error="User does not exist", 
-                        next_page=next_page)
+            self.write(json.dumps({'errors': 'User does not exist'}))
         else:
             expected_pw_hashed = redis_server.hget("user-" + get_un, "password")
             verified_pw = pwd_context.verify(get_pw, expected_pw_hashed)
             if verified_pw:
                 self.set_secure_cookie("user", get_un)
-                self.redirect(next_page)
+                self.write(json.dumps({'redirect': next_page}))
             else: 
-                self.render("login.html", 
-                            title="Login Page",
-                            error="Password is wrong", 
-                            next_page=next_page)
-
+                self.write(json.dumps({'errors': 'Password is wrong'}))
+                
 
 class LogoutHandler(BaseHandler):
 
