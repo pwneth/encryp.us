@@ -51,7 +51,6 @@ $(document).ready(function() {
 				$("#nav").hide();
 				vex.dialog.alert({
 			  		message: 'You have been booted from ' + session_room,
-			  		dialogMessageClassName: 'vex_booted',
 			  		showCloseButton: false,
 			  		overlayClosesOnClick: false,
 			  		callback: function() {

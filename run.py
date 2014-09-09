@@ -207,9 +207,11 @@ class DeleteMessagesHandler(BaseHandler):
 
     '''DeleteMessagesHandler deletes all messages in the chat room'''
     @tornado.web.authenticated
+    @only_admin
     def post(self):
         room = self.get_argument("room")
         redis_server.ltrim("chat-messages-" + room, 1, 0)
+        redis_server.publish("new-messages-" + room, "messages deleted")
 
 class DeleteChatHandler(BaseHandler):
 

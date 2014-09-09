@@ -557,7 +557,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 .chat_img {
-	max-width: 300px;
+	max-width: 500px;
 	vertical-align: middle;
 	padding: 2px;
 	background: #fff;
@@ -608,7 +608,6 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 
 .message {
 	font-size: 14px;
-	padding: 10px;
 	position: relative;
 }
 
@@ -619,20 +618,26 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 .message:nth-child(even){
-	background-color: #f5f5f5;
+	background-color: #f0f0f0;
 }
 
 .name {
+	opacity: .3;
 	font-weight: 700;
-	color: #000;
+	color: #fff;
 	display: inline-block;
+	vertical-align: top;
+	padding: 5px;
+	background-color: black;
 }
 
 .red {
-	color: blue;
+	background-color: blue;
+	font-weight: 700;
 }
 
 .msg {
+	padding: 5px;
 	display: inline-block;
 	max-width: 100%;
 	word-wrap: break-word;
@@ -644,10 +649,11 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 .time {
+	padding: 5px;
 	color: #ccc;
 	position: absolute;
-	top: 10px;
-	right: 10px;
+	top: 0px;
+	right: 0px;
 	display: inline-block;
 }
 
@@ -944,7 +950,7 @@ input[type="submit"]:hover {
 /* VEX STYLES */
 
 .vex_booted {
-	color: red !important;
+	background: red !important;
 }
 
 .vex-overlay {
