@@ -949,6 +949,10 @@ input[type="submit"]:hover {
 
 /* VEX STYLES */
 
+.vex_booted {
+	color: red !important;
+}
+
 .vex-overlay {
 	background: url("bg.png") !important;
 }
@@ -957,11 +961,25 @@ input[type="submit"]:hover {
 	color: blue !important;
 	display: block !important;
 	width: 100% !important;
-	text-align: left !important;
+	text-align: center !important;
 	margin-top: 15px !important;
 	margin-bottom: 10px !important;
 	font-family: "Geo",sans-serif !important;
-	font-size: 15px !important;
+	font-size: 20px !important;
+}
+
+.vex-dialog-button {
+	float: none !important;
+	margin: 0 !important;
+}
+
+.vex-dialog-button:first-child {
+	float: none !important;
+	margin-right: 10px !important;
+}
+
+.vex-dialog-buttons {
+    text-align: center !important;
 }
 
 .vex-content {

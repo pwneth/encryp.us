@@ -178,10 +178,10 @@ class MessageHandler(BaseHandler):
     @tornado.web.authenticated
     @tornado.web.asynchronous
     def post(self):
-        if not is_allowed_in_chat(self.current_user.decode("utf-8"), self.get_argument("room")):
+        self.room = self.get_argument("room")
+        if not is_allowed_in_chat(self.current_user.decode("utf-8"), self.room):
             self.send_error(status_code=401)
         else:
-            self.room = self.get_argument("room")
             logging.debug("listening to {0}".format(self.room))
             subscriber.subscribe("new-messages-" + self.room, self)
 
@@ -230,7 +230,7 @@ class HomeHandler(BaseHandler):
     '''HomeHandler is the handler for room display and user functions'''
     @tornado.web.authenticated
     def get(self):
-        message = self.get_argument("msg", default=None)
+        message = self.get_argument("message", default=None)
         allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
         admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
         requested_chats = redis_server.lrange("user-requests-" + self.current_user.decode("utf-8"), "0", "-1")

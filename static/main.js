@@ -6,6 +6,8 @@ function imgError(image) {
     return true;
 }
 
+var is_img = new RegExp("((?:(?:https?|ftp|file)://|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#/%=~_|$]+.(jpg|png|gif|jpeg|bmp))(?!([^<]+)?>)" , "i");
+
 $(document).ready(function() {
 
 	//decrypt all messages function
@@ -15,10 +17,8 @@ $(document).ready(function() {
 			var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, session_password));
 			if (decrypted_content.substr(0,session_password.length) == session_password) {
 				var msg_data = decrypted_content.substr(session_password.length);
-				if (msg_data.substr(msg_data.length - 4 ) == ".jpg" || 
-					msg_data.substr(msg_data.length - 4 ) == ".gif" ||
-					msg_data.substr(msg_data.length - 4 ) == ".png" ||
-					msg_data.substr(msg_data.length - 5 ) == ".jpeg") {
+				console.log(msg_data.match(is_img));
+				if (msg_data.match(is_img)) {
 					$(this).html("<a href=\"" + msg_data + "\"><img class=\"chat_img\" onerror=\"imgError(this);\" src=\"" + msg_data + "\"></a>");
 				} else {
 					$(this).text(msg_data).linkify();
@@ -33,9 +33,20 @@ $(document).ready(function() {
 	//load messages into messages divs
 	function load_messages(){
 		session_room = sessionStorage.getItem("session_room");
-		$("#messages").load("/message #messages_inner", {room: session_room}, function(txt, status, xhr) {
+		$("#messages").load("/message #messages_inner", {room: session_room}, function(response, status, xhr) {
 			if (xhr.status == 401) {
-				window.location.href = "/home";
+				$("#chat").hide();
+				$("#nav").hide();
+				vex.dialog.alert({
+			  		message: 'You have been booted from ' + session_room,
+			  		dialogMessageClassName: 'vex_booted',
+			  		showCloseButton: false,
+			  		overlayClosesOnClick: false,
+			  		callback: function() {
+			  			window.location.href = "/home";
+						$("body").hide();
+			 		}
+				});
 				return false;
 			}
 			console.log(session_room);
@@ -63,7 +74,8 @@ $(document).ready(function() {
 	  		overlayClosesOnClick: false,
 	  		callback: function(value) {
 	  			if (value == "") {
-					vex_prompt();
+			  		window.location.href = "/home";
+					$("body").hide();
 				} else {
 					sessionStorage.setItem("session_password", value);
 					session_password = sessionStorage.getItem("session_password");
