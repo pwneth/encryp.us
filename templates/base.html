@@ -19,6 +19,25 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body>
+		<div id="nav">
+			<ul>
+				<li id="home"><a href="/">E.U</a></li>
+				{% if title == "Welcome" %}
+				<li><a href="/about">about</a></li>
+				<li><a>github</a></li>
+				{% end %}
+				{% if username %}
+				<li><a href="/logout">logout</a></li>
+				{% end %}
+				{% if room %}
+				<li><a href="/home">rooms</a></li>
+				<li id="del_user"><a>users</a></li>
+				{% if admin %}
+				<li id="delete_messages"><a>delete messages</a></li>
+				{% end %}
+				{% end %}
+			</ul>
+		</div>
 	{% block content %}{% end %}
 	</body>
 </html>

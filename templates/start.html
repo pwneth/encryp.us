@@ -1,15 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-		<div id="nav">
-			<ul>
-				<li id="home"><a href="/">E.U</a></li>
-				<li><a href="/about">about</a></li>
-				<li><a>github</a></li>
-				{% if username %}
-				<li><a href="/logout">logout</a></li>
-				{% end %}
-			</ul>
-		</div>
 		<div id="start_container">
 			<div id="title">Encryp.Us</div>
 			{% if username %}

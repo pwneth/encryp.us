@@ -8,7 +8,19 @@ function imgError(image) {
 
 var is_img = new RegExp("((?:(?:https?|ftp|file)://|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#/%=~_|$]+.(jpg|png|gif|jpeg|bmp))(?!([^<]+)?>)" , "i");
 
+
 $(document).ready(function() {
+
+	if ((window.location.pathname != "/")) {
+		$(window).on('mousemove', function (e) {
+			if (e.pageY <= "10") {
+				$('#nav').slideDown('fast');
+			}
+			if (e.pageY >= "61") {
+				$('#nav').slideUp('fast');
+			}
+		});
+	}
 
 	//decrypt all messages function
 	function decrypt_messages() {
@@ -67,6 +79,7 @@ $(document).ready(function() {
 	//prompt user for encryption password
 	function vex_prompt() {
 		sessionStorage.removeItem("session_password");
+		$("#chat, #nav").hide();
 		vex.dialog.prompt({
 	  		message: 'Please enter your encryption key',
 	 		placeholder: '',
@@ -75,12 +88,11 @@ $(document).ready(function() {
 	  		callback: function(value) {
 	  			if (value == "") {
 			  		window.location.href = "/home";
-					$("body").hide();
 				} else {
 					sessionStorage.setItem("session_password", value);
 					session_password = sessionStorage.getItem("session_password");
 					decrypt_messages();
-					$("#messages").show();
+					$("#chat, #nav").show();
 					$("#chat_input").focus();
 				}
 	 		}
@@ -380,7 +392,7 @@ $(document).ready(function() {
 		window.location.pathname == "/chat") {
 		vex_prompt();
 	} else {
-		$("#messages").show();
+		$("#chat, #nav").show();
 		decrypt_messages();
 	}
 

@@ -169,7 +169,7 @@ class StartHandler(BaseHandler):
         if self.current_user:
             self.redirect("/home")
         else:
-            self.render("start.html", title="Index", username=None)
+            self.render("start.html", title="Welcome", username=None, room=None)
 
 
 class MessageHandler(BaseHandler):
@@ -230,17 +230,16 @@ class HomeHandler(BaseHandler):
     '''HomeHandler is the handler for room display and user functions'''
     @tornado.web.authenticated
     def get(self):
-        message = self.get_argument("message", default=None)
         allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
         admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
         requested_chats = redis_server.lrange("user-requests-" + self.current_user.decode("utf-8"), "0", "-1")
-        self.render("home.html", 
+        self.render("home.html",
                     title="Join Chat Room",
-                    message=message,
                     username=self.current_user, 
                     room_list=allowed_rooms,
                     request_list=requested_chats,
-                    admin_list=admin_rooms)
+                    admin_list=admin_rooms,
+                    room=None)
 
 
 class RequestInviteHandler(BaseHandler):
@@ -412,7 +411,9 @@ class LoginHandler(BaseHandler):
             self.render("login.html", 
                         title="Login Page",
                         error=None, 
-                        next_page=next_page)
+                        next_page=next_page,
+                        username=None, 
+                        room=None)
 
     # post will make sure that user and password combination are valid
     def post(self):
