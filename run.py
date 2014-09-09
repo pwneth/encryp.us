@@ -230,11 +230,13 @@ class HomeHandler(BaseHandler):
     '''HomeHandler is the handler for room display and user functions'''
     @tornado.web.authenticated
     def get(self):
+        message = self.get_argument("msg", default=None)
         allowed_rooms = redis_server.lrange("user-rooms-" + self.current_user.decode("utf-8"), "0", "-1")
         admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
         requested_chats = redis_server.lrange("user-requests-" + self.current_user.decode("utf-8"), "0", "-1")
         self.render("home.html", 
                     title="Join Chat Room",
+                    message=message,
                     username=self.current_user, 
                     room_list=allowed_rooms,
                     request_list=requested_chats,
@@ -247,7 +249,7 @@ class RequestInviteHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self):
         username = self.current_user.decode("utf-8")
-        requested_room = self.get_argument("new_request")
+        requested_room = self.get_argument("new_request_name")
         allowed_rooms = redis_server.lrange("user-rooms-" + username, "0", "-1")
         existing_rooms = redis_server.keys("chat-users-*")
 
@@ -305,10 +307,10 @@ class StartChatHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self):
         form = CreateChat()
-        get_un = self.current_user
+        get_un = self.current_user.decode("utf-8")
         form.chatname.data = self.get_argument("new_chat")
         existing_rooms = redis_server.keys("chat-users-*")
-        admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
+        admin_rooms = redis_server.lrange("user-admin-" + get_un, "0", "-1")
 
         if "chat-users-" + form.chatname.data in existing_rooms:
             self.write(json.dumps({'errors': 'Room already exists'}))
@@ -316,9 +318,9 @@ class StartChatHandler(BaseHandler):
             self.write(json.dumps({'errors': form.errors}))
         else:
             time = datetime.now().strftime("%-I:%M %p")
-            redis_server.rpush("user-rooms-" + get_un.decode("utf-8"), form.chatname.data)
-            redis_server.rpush("user-admin-" + get_un.decode("utf-8"), form.chatname.data)
-            redis_server.rpush("chat-users-" + form.chatname.data, get_un.decode("utf-8"))
+            redis_server.rpush("user-rooms-" + get_un, form.chatname.data)
+            redis_server.rpush("user-admin-" + get_un, form.chatname.data)
+            redis_server.rpush("chat-users-" + form.chatname.data, get_un)
             self.write(json.dumps({'new_chat': form.chatname.data, 'success': 'Chat Added to Your List!'}))
 
 

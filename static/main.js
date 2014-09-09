@@ -287,6 +287,76 @@ $(document).ready(function() {
 	});
 
 
+
+	//new request to chat submit
+	$("#new_request_submit").click(function() {
+		var new_request_name = $("#new_request_name").val();
+
+		$.ajax({
+			dataType: "json",
+            type: "POST",
+            url: "/request",
+            data: {new_request_name: new_request_name},
+            success: function(data){
+	            if (data.errors) {
+	            	var errors_html = "";
+	            	$("#errors_request").html(data.errors);
+	            	$("#success_request").html("");
+		    	}
+		    	else {
+		    		if (!($("#pending_invites").text())) {
+		    			$("#request_list").append("<div style=\"display:none;\" id=\"pending_invites\" class=\"room_title\">PENDING INVITES</div>"	);
+		    			$("#pending_invites").slideDown("slow");
+		    		}
+			        $("#request_list").append("<div style=\"display:none;\" class=\"room_name\">" + data.new_request + "<div class=\"req_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
+			        $("#request_list .room_name:last-child").slideDown("slow");
+			        $("#new_request_name").val("");
+			        $("#errors_request").html("");
+	            	$("#success_request").html(data.success);
+	            	refresh_request_del_event(".room_name:last-child>.req_del");
+		    	}
+            }
+        });
+		return false;
+	});
+
+
+	$("#new_chat_submit").click(function() {
+		var new_chat_name = $("#new_chat_name").val();
+
+		$.ajax({
+			dataType: "json",
+            type: "POST",
+            url: "/startchat",
+            data: {new_chat: new_chat_name},
+            success: function(data){
+	            if (data.errors) {
+	            	var errors_html = "";
+	            	if (data.errors.chatname) {
+		            	for (var i = 0; i < data.errors.chatname.length; i++) {
+		            		errors_html += data.errors.chatname[i] + "<br>";
+		            	}
+		            	$("#errors").html(errors_html);
+		            	$("#success").html("");
+	            	} else {
+	            		$("#errors").html(data.errors);
+	            		$("#success").html("");
+	            	}
+		    	}
+		    	else {
+			        $("#room_list").append("<div style=\"display: none;\" class=\"room_name\"><a href=\"/chat?room=" + data.new_chat + "\">" + data.new_chat + "</a><div class=\"admin_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
+			        $("#room_list .room_name:last-child").slideDown("slow");
+			        $("#new_chat_name").val("");
+			        $("#errors").html("");
+	            	$("#success").html(data.success);
+	            	refresh_chat_room_del_event(".room_name:last-child>.admin_del");
+		    	}
+            }
+        });
+		return false;
+	});
+
+
 	//check if scroll bar and scroll down if
     $.fn.hasScrollBar = function() {
         return this.get(0).scrollHeight > this.height();
@@ -349,7 +419,7 @@ $(document).ready(function() {
 	            	$("#errors").html(data.error);
 		    	}
 		    	else {
-			        $("#del_user_form").append("<div style=\"display: none;\" class=\"user_to_del\">" + data.user + "<div class=\"user_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
+			        $("#allowed_users").append("<div style=\"display: none;\" class=\"user_to_del\">" + data.user + "<div class=\"user_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
 			        $(".user_to_del:last-child").slideDown("slow");
 	            	refresh_delete_user_click_event(".user_to_del:last-child>.user_del");
 	            	$("#add_user_form").slideUp("slow");
@@ -362,72 +432,6 @@ $(document).ready(function() {
 	});
 
 
-	$("#new_chat_submit").click(function() {
-		var new_chat_name = $("#new_chat_name").val();
-
-		$.ajax({
-			dataType: "json",
-            type: "POST",
-            url: "/startchat",
-            data: {new_chat: new_chat_name},
-            success: function(data){
-	            if (data.errors) {
-	            	var errors_html = "";
-	            	if (data.errors.chatname) {
-		            	for (var i = 0; i < data.errors.chatname.length; i++) {
-		            		errors_html += data.errors.chatname[i] + "<br>";
-		            	}
-		            	$("#errors").html(errors_html);
-		            	$("#success").html("");
-	            	} else {
-	            		$("#errors").html(data.errors);
-	            		$("#success").html("");
-	            	}
-		    	}
-		    	else {
-			        $("#room_list").append("<div style=\"display: none;\" class=\"room_name\"><a href=\"/chat?room=" + data.new_chat + "\">" + data.new_chat + "</a><div class=\"admin_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
-			        $("#room_list .room_name:last-child").slideDown("slow");
-			        $("#new_chat_name").val("");
-			        $("#errors").html("");
-	            	$("#success").html(data.success);
-	            	refresh_chat_room_del_event(".room_name:last-child>.admin_del");
-		    	}
-            }
-        });
-		return false;
-	});
-
-	//new request to chat submit
-	$("#new_request_submit").click(function() {
-		var new_request_name = $("#new_request_name").val();
-
-		$.ajax({
-			dataType: "json",
-            type: "POST",
-            url: "/request",
-            data: {new_request: new_request_name},
-            success: function(data){
-	            if (data.errors) {
-	            	var errors_html = "";
-	            	$("#errors_request").html(data.errors);
-	            	$("#success_request").html("");
-		    	}
-		    	else {
-		    		if (!($("#pending_invites").text())) {
-		    			$("#request_list").append("<div style=\"display:none;\" id=\"pending_invites\" class=\"room_title\">PENDING INVITES</div>"	);
-		    			$("#pending_invites").slideDown("slow");
-		    		}
-			        $("#request_list").append("<div style=\"display:none;\" class=\"room_name\">" + data.new_request + "<div class=\"req_del\"><i class=\"icon ion-ios7-close-empty\"></i></div></div>");
-			        $("#request_list .room_name:last-child").slideDown("slow");
-			        $("#new_request_name").val("");
-			        $("#errors_request").html("");
-	            	$("#success_request").html(data.success);
-	            	refresh_request_del_event(".room_name:last-child>.req_del");
-		    	}
-            }
-        });
-		return false;
-	});
 
 	//shows hidden menu items when menu button is clicked
 	$("#menu_btn").click(function() {
@@ -466,6 +470,7 @@ $(document).ready(function() {
 	//on clicking add user show the add user form
 	$("#add_user").click(function() {
 		$("#add_user_form").slideToggle();
+		$("#new_username").focus();
 	});
 
 	//when delete messages is clicked, do the following
