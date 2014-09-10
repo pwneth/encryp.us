@@ -85,14 +85,6 @@ $(document).ready(function() {
 		});
 	}
 
-	function getUrlVars() {
-	    var vars = {};
-	    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-	        vars[key] = value;
-	    });
-	    return vars;
-	}
-
 	//when user_del is clicked delete the user and do the following
 	function refresh_delete_user_click_event(selector) {
 		$(selector).click(function() {
