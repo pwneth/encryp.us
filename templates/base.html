@@ -15,7 +15,16 @@
 		<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
 		<script src="{{ static_url("vex.combined.min.js") }}"></script>
 		<script>vex.defaultOptions.className = 'vex-theme-os';</script>
-		<script src="{{ static_url("main.js") }}"></script>
+		<script src="{{ static_url("global.js") }}"></script>
+		{% if room %}
+		<script src="{{ static_url("room.js") }}"></script>
+		{% end %}
+		{% if title == "Login" %}
+		<script src="{{ static_url("login.js") }}"></script>
+		{% end %}
+		{% if title == "Home" %}
+		<script src="{{ static_url("home.js") }}"></script>
+		{% end %}
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body>

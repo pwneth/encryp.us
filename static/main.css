@@ -621,19 +621,41 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	background-color: #f0f0f0;
 }
 
-.name {
-	opacity: .3;
+.message:nth-child(even) .name:after{
+	background-color: #f0f0f0;
+}
+
+.message:nth-child(odd) .name:after{
+	background-color: #fff;
+}
+
+.name {/*
+	opacity: .3;*/
 	font-weight: 700;
 	color: #fff;
 	display: inline-block;
 	vertical-align: top;
-	padding: 5px;
-	background-color: black;
+	padding: 5px 10px 5px 5px;
+	background-color: rgba(0,0,0,.3);
+	position: relative;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+.name:after {
+	content: " ";
+	width: 10px;
+	height: 10px;
+	position: absolute;
+	transform: rotate(-45deg);
+	right: -6px;
+	top: 13px;
+	z-index: 10;
 }
 
 .red {
 	background-color: blue;
-	font-weight: 700;
 }
 
 .msg {
@@ -919,6 +941,7 @@ label {
 }
 
 input[type="text"], input[type="password"] {
+	font-size: 14px;
 	height: 3em;
 	margin-top: 1em;
 	padding-left: 1em;

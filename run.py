@@ -236,7 +236,7 @@ class HomeHandler(BaseHandler):
         admin_rooms = redis_server.lrange("user-admin-" + self.current_user.decode("utf-8"), "0", "-1")
         requested_chats = redis_server.lrange("user-requests-" + self.current_user.decode("utf-8"), "0", "-1")
         self.render("home.html",
-                    title="Join Chat Room",
+                    title="Home",
                     username=self.current_user, 
                     room_list=allowed_rooms,
                     request_list=requested_chats,
@@ -411,7 +411,7 @@ class LoginHandler(BaseHandler):
             self.redirect(next_page)
         else:
             self.render("login.html", 
-                        title="Login Page",
+                        title="Login",
                         error=None, 
                         next_page=next_page,
                         username=None, 
@@ -482,11 +482,27 @@ class CreateAccountHandler(BaseHandler):
             self.write(json.dumps({'redirect': '/home'}))
 
 
+class OtrChatHandler(BaseHandler):
+
+    '''This handler will handle 1 on 1 convos'''
+    @tornado.web.authenticated
+    def get(self):
+        partner = self.get_argument("user")
+        username = self.current_user.decode("utf-8")
+        self.render("otr.html",
+                    title="OTR chat with " + partner,
+                    partner=partner,
+                    username=username,
+                    room=None)
+
+
+
 def make_app():
     '''this is the main application function'''
     app = Application([
         url(r"/", StartHandler),
         url(r"/chat", ChatHandler),
+        url(r"/otrchat", OtrChatHandler),
         url(r"/home", HomeHandler),
         url(r"/deletechat", DeleteChatHandler),
         url(r"/startchat", StartChatHandler),
