@@ -36,7 +36,6 @@ class CreateUser(Form):
 
     confirm  = PasswordField('Repeat Password')
 
-
 #create chat validation
 class CreateChat(Form):
     chatname = StringField('Chat Name', [
@@ -89,11 +88,20 @@ class MessageSubscriber(tornadoredis.pubsub.BaseSubscriber):
 subscriber = MessageSubscriber(c)
 
 
-# loads json data and append decrypted information to an array and return
-# it for the templates to use
+# loads messages for specified chat room
 def append_messages(room):
     messages = []
     message_data = redis_server.lrange("chat-messages-" + room, "0", "-1")
+
+    for f in message_data:
+        messages.append(message(json.loads(f)))
+
+    return messages
+
+#loads messages for specified user connection
+def append_messages_otr(users):
+    messages = []
+    message_data = redis_server.lrange("otr-messages-" + users, "0", "-1")
 
     for f in message_data:
         messages.append(message(json.loads(f)))
@@ -213,6 +221,7 @@ class DeleteMessagesHandler(BaseHandler):
         redis_server.ltrim("chat-messages-" + room, 1, 0)
         redis_server.publish("new-messages-" + room, "messages deleted")
 
+
 class DeleteChatHandler(BaseHandler):
 
     '''DeleteChatHandler deletes a chat room if user is admin'''
@@ -270,6 +279,7 @@ class RequestInviteHandler(BaseHandler):
         request_to_delete = self.get_argument("reqtodel")
         redis_server.lrem("user-requests-" + username, request_to_delete, "0")
         redis_server.lrem("chat-requests-" + request_to_delete, username, "0")
+
 
 class InviteHandler(BaseHandler):
 
@@ -473,7 +483,6 @@ class CreateAccountHandler(BaseHandler):
         if redis_server.hget("user-" + form.username.data, "password"):
             self.write(json.dumps({'errors': 'User name already taken'}))
         elif form.validate() == False: 
-            errors = form.errors
             self.write(json.dumps({'errors': form.errors}))
         else:
             hashed_pw = pwd_context.encrypt(form.password.data)
@@ -481,20 +490,101 @@ class CreateAccountHandler(BaseHandler):
             self.set_secure_cookie("user", form.username.data)
             self.write(json.dumps({'redirect': '/home'}))
 
+class UpdatePassword(BaseHandler):
+
+    '''OtrNewChat allows user at home.html to type in a user and chat with them'''
+    @tornado.web.authenticated
+    def post(self):
+        get_un = self.current_user.decode("utf-8")
+        old_password = self.get_argument("old_password")
+        new_password = self.get_argument("new_password")
+        confirm_password = self.get_argument("confirm_password")
+
+        expected_pw_hashed = redis_server.hget("user-" + get_un, "password")
+        verified_pw = pwd_context.verify(old_password, expected_pw_hashed)
+
+        if verified_pw == False: 
+            self.write(json.dumps({'errors': 'Wrong password'}))
+        elif new_password != confirm_password:
+            self.write(json.dumps({'errors': 'Passwords do not match'}))
+        elif old_password == new_password:
+            self.write(json.dumps({'errors': 'New password and old password are the same'}))
+        else:
+            hashed_pw = pwd_context.encrypt(new_password)
+            redis_server.hmset("user-" + get_un, {"password":hashed_pw})
+            self.write(json.dumps({'success': 'Password Updated!'}))
+
+
+class OtrNewChat(BaseHandler):
+
+    '''OtrNewChat allows user at home.html to type in a user and chat with them'''
+    @tornado.web.authenticated
+    def post(self):
+        partner = self.get_argument("partner")
+        username = self.current_user.decode("utf-8")
+
+        if partner == username:
+            self.write(json.dumps({'errors': 'Can\'t chat with yourself!'}))
+        elif redis_server.hget("user-" + partner, "password") is None:
+            self.write(json.dumps({'errors': 'User does not exist'}))
+        else:
+            self.write(json.dumps({'partner': partner}))
+
+
+class OtrMessageHandler(BaseHandler):
+
+    '''OtrMessageHandler handles otr one to one messages'''
+    @tornado.web.authenticated
+    @tornado.web.asynchronous
+    def post(self):
+        self.users = self.get_argument("users")
+        self.partner = self.get_argument("user")
+        logging.debug("listening to {0}".format(self.users))
+        subscriber.subscribe("new-otr-messages-" + self.users, self)
+
+    def render_now(self,close=False):
+        username = self.current_user.decode("utf-8")
+        logging.debug("rendering now {0}".format(self.users))
+        self.render("otr.html", 
+                    title="OTR Chat",
+                    username=username, 
+                    partner=self.partner,
+                    messages=append_messages_otr(self.users),
+                    users=self.users,
+                    room=None)
+        if not close:
+            subscriber.unsubscribe("new-otr-messages-" + self.users, self)
+
 
 class OtrChatHandler(BaseHandler):
 
-    '''This handler will handle 1 on 1 convos'''
+    '''OtrChatHandler shows the otr chat room'''
     @tornado.web.authenticated
     def get(self):
         partner = self.get_argument("user")
         username = self.current_user.decode("utf-8")
-        self.render("otr.html",
-                    title="OTR chat with " + partner,
+        users = [partner,username]
+        users.sort()
+        users = users[0] + "-" + users[1]
+        self.render("otr.html", 
+                    title="OTR Chat",
+                    username=username, 
                     partner=partner,
-                    username=username,
+                    messages=append_messages_otr(users),
+                    users=users,
                     room=None)
 
+    @tornado.web.authenticated
+    def post(self):
+        username = self.current_user.decode("utf-8")
+        msg = self.get_argument("message")
+        time = datetime.now().strftime("%-I:%M %p")
+        users = self.get_argument("users")
+
+        json_message = json.dumps({'name':username, 'message':msg, 'time':time})
+        redis_server.rpush("otr-messages-" + users, json_message)
+
+        redis_server.publish("new-otr-messages-" + users, msg)
 
 
 def make_app():
@@ -503,6 +593,7 @@ def make_app():
         url(r"/", StartHandler),
         url(r"/chat", ChatHandler),
         url(r"/otrchat", OtrChatHandler),
+        url(r"/otrnew", OtrNewChat),
         url(r"/home", HomeHandler),
         url(r"/deletechat", DeleteChatHandler),
         url(r"/startchat", StartChatHandler),
@@ -510,11 +601,13 @@ def make_app():
         url(r"/invite", InviteHandler),
         url(r"/test", TestHandler),
         url(r"/message", MessageHandler),
+        url(r"/otrmessage", OtrMessageHandler),
         url(r"/deletemessages", DeleteMessagesHandler),
         url(r"/user", UserHandler),
         url(r"/createaccount", CreateAccountHandler),
         url(r"/login", LoginHandler),
-        url(r"/logout", LogoutHandler)
+        url(r"/logout", LogoutHandler),
+        url(r"/updatepw", UpdatePassword)
     ],
         template_path="templates",
         static_path="static",

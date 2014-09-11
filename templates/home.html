@@ -1,52 +1,86 @@
 {% extends "base.html" %}
 {% block content %}
 		<div id="join_container">
-			<div class="room_container">
-				<div class="room_title">CHOOSE A ROOM</div>
-				<div id="room_list">
-				{% if len(room_list) == 0 %}
-					<div class="room_name">No Rooms Available</div>
-				{% end %}
-					{% for rooms in room_list %}
-					<div class="room_name"><a href="/chat?room={{ rooms }}">{{ rooms }}</a>
-						{% if rooms in admin_list %}
-							<div class="admin_del"><i class="icon ion-ios7-close-empty"></i></div>
+			<div id="home_left">
+				<div class="room_container">
+					<div class="room_title">CHOOSE A ROOM</div>
+					<div id="room_list">
+					{% if len(room_list) == 0 %}
+						<div class="room_name">No Rooms Available</div>
+					{% end %}
+						{% for rooms in room_list %}
+						<div class="room_name"><a href="/chat?room={{ rooms }}">{{ rooms }}</a>
+							{% if rooms in admin_list %}
+								<div class="admin_del"><i class="icon ion-ios7-close-empty"></i></div>
+							{% end %}
+						</div>
 						{% end %}
 					</div>
-					{% end %}
+					
+				</div>
+				<div class="room_container">
+					<div class="room_title">CREATE A ROOM</div>
+					<div id="new_chat">
+						<form method="POST">
+							<div id="errors"></div>
+							<div id="success"></div>
+							<label for="new_chat">ROOM NAME: </label>
+							<input id="new_chat_name" type="text" name="new_chat_name" autocomplete="off" required>
+							<input id="new_chat_submit" type="submit" value="create new room">
+						</form>
+					</div>
 				</div>
 				
 			</div>
-			<div class="room_container">
-				<div class="room_title">CREATE A ROOM</div>
-				<div id="new_chat">
-					<form method="POST">
-						<div id="errors"></div>
+			<div id="home_right">
+				<div class="room_container">
+					<div class="room_title">OTR CHAT WITH USER</div>
+					<div id="new_chat">
 
-						<div id="success"></div>
-						<label for="new_chat">ROOM NAME: </label>
-						<input id="new_chat_name" type="text" name="new_chat_name" autocomplete="off" required>
-						<input id="new_chat_submit" type="submit" value="create new room">
-					</form>
+						<form>
+							<div id="errors_otr"></div>
+							<label for="new_otr_chat">USER NAME: </label>
+							<input id="new_otr_chat" type="text" name="new_otr_chat" autocomplete="off" required>
+							<input id="new_otr_submit" type="submit" value="otr chat">
+						</form>
+					</div>
 				</div>
-			</div>
-			<div class="room_container">
-				<div class="room_title req_title">REQUEST INVITE</div>
-				<div id="request_list">
+				<div class="room_container">
+					<div class="room_title">UPDATE PASSWORD</div>
+					<div id="new_chat">
 
-					<form action="/request" method="POST">
-						<div id="errors_request"></div>
-						<input id="new_request_name" type="text" name="new_request_name" autocomplete="off" placeholder="Enter room name..." required>
-						<input id="new_request_submit" type="submit" value="request invite">
-					</form>
-					{% if len(request_list) > 0 %}
-					<div id="pending_invites" class="room_title">PENDING INVITES</div>
-					{% for rooms in request_list %}
-						<div class="room_name">{{ rooms }}
-							<div class="req_del"><i class="icon ion-ios7-close-empty"></i></div>
-						</div>
-					{% end %}
-					{% end %}
+						<form>
+							<div id="errors_pw"></div>
+							<div id="success_pw"></div>
+							<label for="old_password">OLD PASSWORD: </label>
+							<input id="old_password" type="password" name="old_password" autocomplete="off" required>
+							<label for="new_password">NEW PASSWORD: </label>
+							<input id="new_password" type="password" name="new_password" autocomplete="off" required>
+							<label for="confirm_password">CONFIRM PASSWORD: </label>
+							<input id="confirm_password" type="password" name="confirm_password" autocomplete="off" required>
+							<input id="update_pw_submit" type="submit" value="update password">
+						</form>
+					</div>
+				</div>
+				<div class="room_container">
+					<div class="room_title req_title">REQUEST INVITE</div>
+					<div id="new_chat">
+
+						<form action="/request" method="POST">
+							<div id="errors_request"></div>
+							<label for="new_chat">ROOM NAME: </label>
+							<input id="new_request_name" type="text" name="new_request_name" autocomplete="off" required>
+							<input id="new_request_submit" type="submit" value="request invite">
+						</form>
+						{% if len(request_list) > 0 %}
+						<div id="pending_invites" class="room_title">PENDING INVITES</div>
+						{% for rooms in request_list %}
+							<div class="room_name">{{ rooms }}
+								<div class="req_del"><i class="icon ion-ios7-close-empty"></i></div>
+							</div>
+						{% end %}
+						{% end %}
+					</div>
 				</div>
 			</div>
 		</div>

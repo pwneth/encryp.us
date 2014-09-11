@@ -8,8 +8,23 @@ function imgError(image) {
 
 var is_img = new RegExp("((?:(?:https?|ftp|file)://|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#/%=~_|$]+.(jpg|png|gif|jpeg|bmp))(?!([^<]+)?>)" , "i");
 
+//check if scroll bar and scroll down if
+$.fn.hasScrollBar = function() {
+    return this.get(0).scrollHeight > this.height();
+};
 
 $(document).ready(function() {
+
+	var messageDiv = document.getElementById("messages");
+
+	$(window).on('mousemove', function (e) {
+		if (e.pageY <= 10) {
+			$('#nav').slideDown('fast');
+		}
+		if (e.pageY >= 61) {
+			$('#nav').slideUp('fast');
+		}
+	});
 
 	//decrypt all messages function
 	function decrypt_messages() {
@@ -22,6 +37,14 @@ $(document).ready(function() {
 					$(this).html("<a href=\"" + msg_data + "\"><img class=\"chat_img\" onerror=\"imgError(this);\" src=\"" + msg_data + "\"></a>");
 				} else {
 					$(this).text(msg_data).linkify();
+				}
+				if ($("#messages").hasScrollBar()) {
+					messageDiv.scrollTop = messageDiv.scrollHeight;
+				} else {
+					$("#messages_inner").css({
+						top: "auto",
+						bottom: 0
+					});
 				}
 			} else {
 				vex_prompt();
@@ -47,18 +70,10 @@ $(document).ready(function() {
 			 		}
 				});
 				return false;
-			}
-			decrypt_messages();
-			setTimeout(load_messages, 0);
-			if ($("#messages").hasScrollBar()) {
-				messageDiv.scrollTop = messageDiv.scrollHeight;
 			} else {
-				$("#messages_inner").css({
-					top: "auto",
-					bottom: 0
-				});
+				decrypt_messages();
+				setTimeout(load_messages, 0);
 			}
-
 		});
 	}
 
@@ -113,19 +128,9 @@ $(document).ready(function() {
 	function request_accept(selector) {
 			//add user form is submitted, do the following
 		$(selector).click(function() {
-			// var user_list = [];
-			// $(".user_to_del").each(function() {
-			// 	user_list.push($(this).text().trim());
-			// });
 			var username_box = $(this).parent();
 			var username = username_box.text();
 			var admin = "no";
-
-			// if ($("#new_admin:checked").val()) {
-			// 	var admin = "yes"
-			// } else {
-			// 	var admin = "no"
-			// }
 
 			$.ajax({
 				dataType: "json",
@@ -151,7 +156,6 @@ $(document).ready(function() {
 		});
 	}
 
-
 	function request_reject(selector) {
 		$(selector).click(function() {
 			var username_box = $(this).parent();
@@ -176,10 +180,8 @@ $(document).ready(function() {
 		});
 	}
 
-	//check if scroll bar and scroll down if
-    $.fn.hasScrollBar = function() {
-        return this.get(0).scrollHeight > this.height();
-    };
+	//scroll message div to bottom when message is received 
+	$("#messages").scrollTop = messageDiv.scrollHeight;
 
 	session_password = sessionStorage.getItem("session_password");
 
@@ -194,7 +196,6 @@ $(document).ready(function() {
 	var session_room = getUrlVars()["room"];
 	sessionStorage.setItem("session_room", session_room);
 
-
     //focus on chat input when in chat window
 	$("#chat_input").focus();
 
@@ -202,7 +203,7 @@ $(document).ready(function() {
 	setTimeout(load_messages, 0);
 
 	//if messages div has a scroll bar position the div accordingly
-	if (!($("#messages").hasScrollBar())) {
+	if (!$("#messages").hasScrollBar()) {
 		$("#messages_inner").css({
 			top: "auto",
 			bottom: 0
@@ -246,15 +247,10 @@ $(document).ready(function() {
 		return false;
 	});
 
-	//scroll message div to bottom when message is received 
-	var messageDiv = document.getElementById("messages");
-	messageDiv.scrollTop = messageDiv.scrollHeight;
-
 	//on submitting a message do the following
 	$("#chat_submit").click(function() {
 		var message = session_password + $("#chat_input").val();
 		if (message == session_password) {
-			$("#chat_submit").effect( "highlight", {color: 'red'}, 1000 );
 			$("#chat_submit").attr("value", "can't be empty");
 			return false;
 		} else {
@@ -265,7 +261,6 @@ $(document).ready(function() {
 	            url: "/chat",
 	            data: {message: encrypted_message, room: session_room},
 	            success: function(){
-	                	$("#chat_submit").effect( "highlight", {color: '#53ED6A'}, 500 );
 						$("#chat_input").val("");
 						$("#chat_submit").attr("value", "submit");
 						$("#chat_input").focus();

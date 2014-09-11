@@ -1,8 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
-	<div id="login_container">
-		<div style="background: #fff; width: 400px; margin: 0 auto;">
-		{{ username }} wants to chat with {{ partner }}.
+	<div id="chat">
+			<div id="users_txt">{{ users }}</div>
+			<div id="messages">
+				<div id="messages_inner">
+					{% for msg in messages %}
+						{% module Template("message.html", msg=msg, username=username) %}
+					{% end %}
+				</div>
+			</div>
+			<div id="message_input">
+				<form method="POST">
+					<input id="chat_input" type="text" name="message" autocomplete="off">
+					<input id="chat_submit" type="submit" value="submit">
+				</form>
+			</div>
 		</div>
-	</div>
 {% end %}

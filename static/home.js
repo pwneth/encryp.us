@@ -49,6 +49,9 @@ $(document).ready(function() {
 		});
 	}
 
+	sessionStorage.removeItem("session_room");
+	sessionStorage.removeItem("session_password");
+
 	refresh_chat_room_del_event(".admin_del")
 	refresh_request_del_event(".req_del")
 
@@ -84,6 +87,10 @@ $(document).ready(function() {
 		return false;
 	});
 
+	$(".room_title").click(function() {
+		$(this).siblings("#new_chat, #room_list").slideToggle();
+	});
+
 	$("#new_chat_submit").click(function() {
 		var new_chat_name = $("#new_chat_name").val();
 
@@ -113,6 +120,54 @@ $(document).ready(function() {
 			        $("#errors").html("");
 	            	$("#success").html(data.success);
 	            	refresh_chat_room_del_event(".room_name:last-child>.admin_del");
+		    	}
+            }
+        });
+		return false;
+	});
+
+
+	$("#new_otr_submit").click(function() {
+		var new_otr_chat = $("#new_otr_chat").val();
+
+		$.ajax({
+			dataType: "json",
+            type: "POST",
+            url: "/otrnew",
+            data: {partner: new_otr_chat},
+            success: function(data){
+	            if (data.errors) {
+		            $("#errors_otr").html(data.errors);
+		    	}
+		    	else {
+			        window.location.pathname = "/otrchat?user=" + new_otr_chat;
+		    	}
+            }
+        });
+		return false;
+	});
+
+	$("#update_pw_submit").click(function() {
+		var old_password = $("#old_password").val();
+		var new_password = $("#new_password").val();
+		var confirm_password = $("#confirm_password").val();
+
+		$.ajax({
+			dataType: "json",
+            type: "POST",
+            url: "/updatepw",
+            data: {old_password: old_password, new_password: new_password, confirm_password: confirm_password},
+            success: function(data){
+	            if (data.errors) {
+		            $("#success_pw").html("");
+		           	$("#errors_pw").html(data.errors);
+		    	}
+		    	else {
+		            $("#errors_pw").html("");
+		            $("#success_pw").html(data.success);
+					$("#old_password").val("");
+					$("#new_password").val("");
+					$("#confirm_password").val("");
 		    	}
             }
         });
