@@ -4,10 +4,9 @@ Encrypted Chat with Python Tornado and Redis
 Nice to haves:
 --------------
  - emoji
- - add images
  - add sounds
 
-Should do:
+Planned Enhancements:
 ----------
  - add better encryption - multi-layer
  - add encryption to everything i.e. username, password, timestamp
@@ -15,15 +14,21 @@ Should do:
  - personal question to ask user upon entering for the first time --
    validated
  - change routing of urls
+ - add otr with user to user chat
 
 Necessary:
 ----------
- - change password
- - boot user
  - ssl
- - request invite to room
+ - nginx
+ - docker?
 
- > REQUIREMENTS
+Bugs:
+-----
+ - chrome window.pathname
+ - messages not sending when live - memory issue?
+  
+Requirements:
+-------------
  - Markdown==2.4.1
  - WTForms==2.0.1
  - certifi==14.05.14
