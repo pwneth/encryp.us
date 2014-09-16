@@ -2,11 +2,11 @@
 	{% if escape(username) == escape(msg.name) %}
 	<div class="name">
 	{% else %}
-	<div class="name red">
+	<div class="name notme">
 	{% end %}
-		{{ escape(msg.name)	 }}&nbsp;
+		{{ escape(msg.name)	 }}
 	</div>
-	<div class="msg" data-msg="{{ escape(msg.msg) }}"></div>
+	<div class="msg">{{ escape(msg.msg) }}</div>
 	<div class="time">
 		{{ escape(msg.time) }}
 	</div>

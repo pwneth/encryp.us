@@ -105,7 +105,6 @@ def append_messages_otr(users):
 
     for f in message_data:
         messages.append(message(json.loads(f)))
-        print(f)
 
     return messages
 
@@ -547,12 +546,8 @@ class OtrMessageHandler(BaseHandler):
         username = self.current_user.decode("utf-8")
         message_data = redis_server.lrange("otr-messages-" + self.users, "0", "-1")
         logging.debug("rendering now {0}".format(self.users))
-        self.render("otr.html", 
-                    title="OTR Chat",
-                    username=username, 
-                    messages=append_messages_otr(self.users),
-                    users=self.users,
-                    room=None)
+        self.write(json.dumps({'message': json.loads(message_data[-1]), 'username':username}))
+        self.finish()
         if not close:
             subscriber.unsubscribe("new-otr-messages-" + self.users, self)
 

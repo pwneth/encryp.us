@@ -657,7 +657,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	color: #fff;
 	display: inline-block;
 	vertical-align: top;
-	padding: 5px 10px 5px 5px;
+	padding: 5px 15px 5px 5px;
 	background-color: rgba(0,0,0,.3);
 	position: relative;
 	border-right: 1px solid #999;
@@ -680,19 +680,19 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	border-width: 1px 0px 0px 1px;
 }
 
-.red {
+.notme {
 	background-color: rgba(0,0,255,.3);
 	border-right: 1px solid rgba(0,0,255,.1);
 	border-bottom: 1px solid rgba(0,0,255,.1);
 }
 
-.red:after {
+.notme:after {
 	border: 1px solid rgba(0,0,255,.4);
 	border-width: 1px 0px 0px 1px;
 }
 
 .msg {
-	padding: 5px;
+	padding: 5px 5px 5px 10px;
 	display: inline-block;
 	max-width: 100%;
 	word-wrap: break-word;

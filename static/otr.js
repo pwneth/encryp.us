@@ -7,7 +7,7 @@ function imgError(image) {
 }
 
 var is_img = new RegExp("((?:(?:https?|ftp|file)://|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#/%=~_|$]+.(jpg|png|gif|jpeg|bmp))(?!([^<]+)?>)" , "i");
-
+var is_link = new RegExp("https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_+.~#?&//=]*)" , "i");
 
 $(document).ready(function() {
 
@@ -23,49 +23,66 @@ $(document).ready(function() {
 		}
 	});
 
+	function decrypt_message(message) {
+		var encrypted_content = message;
+		var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, session_password));
+		
+		if (decrypted_content.substr(0,session_password.length) == session_password) {
+			var msg_data = decrypted_content.substr(session_password.length);
+			if (msg_data.match(is_img)) {
+				return "<a href=\"" + msg_data + "\"><img class=\"chat_img\" onerror=\"imgError(this);\" src=\"" + msg_data + "\"></a>";
+			} else if (msg_data.match(is_link)) {
+				return "<a href=\"" + msg_data + "\">" + msg_data + "</a>";
+			} else {
+				return msg_data;
+			}
+		} else {
+			vex_prompt();
+			return false;
+		}	
+	}
+
 	//decrypt all messages function
 	function decrypt_messages() {
 		$(".msg").each(function( index ) {
-			var encrypted_content = $(this).data("msg");
-			var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, session_password));
-			if (decrypted_content.substr(0,session_password.length) == session_password) {
-				var msg_data = decrypted_content.substr(session_password.length);
-				if (msg_data.match(is_img)) {
-					$(this).html("<a href=\"" + msg_data + "\"><img class=\"chat_img\" onerror=\"imgError(this);\" src=\"" + msg_data + "\"></a>");
-				} else {
-					$(this).text(msg_data).linkify();
-				}
-			} else {
-				vex_prompt();
-				return false;
-			}
+			$(this).html(decrypt_message($(this).text()));
 		});
 	}
 
 	//load messages into messages divs
 	function load_messages(){
-		$("#messages").load("/otrmessage #messages_inner", 
-			{users: usersort}, 
-			function(response, status, xhr) {
-				decrypt_messages();
-				setTimeout(load_messages, 0);
-				if ($("#messages").hasScrollBar()) {
-					messageDiv.scrollTop = messageDiv.scrollHeight;
-				} else {
-					$("#messages_inner").css({
-						top: "auto",
-						bottom: 0
-					});
-				}
-
-		});
+		$.ajax({
+			type: "POST",
+            dataType: "json",
+            url: "/otrmessage",
+            data: {users: usersort},
+            success: function(data){
+                	console.log(data);
+                	var html_message = "";
+                	var classname = "";
+                	if (data.username != data.message.name) {
+                		classname = "notme";
+                	}
+                	html_message = "<div class=\"message\"><div class=\"name " + classname + "\">" + data.message.name + "</div><div class=\"msg\">" + decrypt_message(data.message.message) + "</div><div class=\"time\">" + data.message.time + "</div></div>";
+                	$("#messages_inner").append(html_message);
+					if ($("#messages").hasScrollBar()) {
+						messageDiv.scrollTop = messageDiv.scrollHeight;
+					} else {
+						$("#messages_inner").css({
+							top: "auto",
+							bottom: 0
+						});
+					}
+                	setTimeout(load_messages, 0);
+            	}
+            });
 	}
 
 	//prompt user for encryption password
 	function vex_prompt() {
 		sessionStorage.removeItem("session_password");
 		$("#chat, #nav").hide();
-		vex.dialog.prompt({
+		vex.dialog.alert({
 	  		message: 'Please enter your encryption key',
 	 		placeholder: '',
 	  		showCloseButton: false,
@@ -119,7 +136,6 @@ $(document).ready(function() {
 
 	//on submitting a message do the following
 	$("#chat_submit").click(function() {
-		console.log(usersort);
 		var message = session_password + $("#chat_input").val();
 		if (message == session_password) {
 			$("#chat_submit").effect( "highlight", {color: 'red'}, 1000 );
