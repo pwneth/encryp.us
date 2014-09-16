@@ -105,6 +105,7 @@ def append_messages_otr(users):
 
     for f in message_data:
         messages.append(message(json.loads(f)))
+        print(f)
 
     return messages
 
@@ -522,13 +523,14 @@ class OtrNewChat(BaseHandler):
     def post(self):
         partner = self.get_argument("partner")
         username = self.current_user.decode("utf-8")
+        redirect = "/otrchat?user=" + partner
 
         if partner == username:
             self.write(json.dumps({'errors': 'Can\'t chat with yourself!'}))
         elif redis_server.hget("user-" + partner, "password") is None:
             self.write(json.dumps({'errors': 'User does not exist'}))
         else:
-            self.write(json.dumps({'partner': partner}))
+            self.write(json.dumps({'redirect': redirect}))
 
 
 class OtrMessageHandler(BaseHandler):
@@ -538,17 +540,16 @@ class OtrMessageHandler(BaseHandler):
     @tornado.web.asynchronous
     def post(self):
         self.users = self.get_argument("users")
-        self.partner = self.get_argument("user")
         logging.debug("listening to {0}".format(self.users))
         subscriber.subscribe("new-otr-messages-" + self.users, self)
 
     def render_now(self,close=False):
         username = self.current_user.decode("utf-8")
+        message_data = redis_server.lrange("otr-messages-" + self.users, "0", "-1")
         logging.debug("rendering now {0}".format(self.users))
         self.render("otr.html", 
                     title="OTR Chat",
                     username=username, 
-                    partner=self.partner,
                     messages=append_messages_otr(self.users),
                     users=self.users,
                     room=None)
@@ -569,7 +570,6 @@ class OtrChatHandler(BaseHandler):
         self.render("otr.html", 
                     title="OTR Chat",
                     username=username, 
-                    partner=partner,
                     messages=append_messages_otr(users),
                     users=users,
                     room=None)

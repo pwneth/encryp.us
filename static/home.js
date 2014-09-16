@@ -140,7 +140,7 @@ $(document).ready(function() {
 		            $("#errors_otr").html(data.errors);
 		    	}
 		    	else {
-			        window.location.pathname = "/otrchat?user=" + new_otr_chat;
+			        window.location.href = decodeURIComponent(data.redirect);
 		    	}
             }
         });

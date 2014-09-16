@@ -10,7 +10,7 @@ var is_img = new RegExp("((?:(?:https?|ftp|file)://|www\.|ftp\.)[-A-Z0-9+&@#/%=~
 
 
 $(document).ready(function() {
-	
+
 	var usersort = $("#users_txt").text();
 	var messageDiv = document.getElementById("messages");
 
@@ -44,17 +44,19 @@ $(document).ready(function() {
 
 	//load messages into messages divs
 	function load_messages(){
-		$("#messages").load("/otrmessage #messages_inner", {users: usersort, user: usersort}, function(response, status, xhr) {
-			decrypt_messages();
-			setTimeout(load_messages, 0);
-			if ($("#messages").hasScrollBar()) {
-				messageDiv.scrollTop = messageDiv.scrollHeight;
-			} else {
-				$("#messages_inner").css({
-					top: "auto",
-					bottom: 0
-				});
-			}
+		$("#messages").load("/otrmessage #messages_inner", 
+			{users: usersort}, 
+			function(response, status, xhr) {
+				decrypt_messages();
+				setTimeout(load_messages, 0);
+				if ($("#messages").hasScrollBar()) {
+					messageDiv.scrollTop = messageDiv.scrollHeight;
+				} else {
+					$("#messages_inner").css({
+						top: "auto",
+						bottom: 0
+					});
+				}
 
 		});
 	}
