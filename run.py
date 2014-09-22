@@ -63,8 +63,7 @@ class MessageSubscriber(tornadoredis.pubsub.BaseSubscriber):
             # Get the list of subscribers for this channel
             subscribers = list(self.subscribers[msg.channel].keys())
             if subscribers:
-                # Use the first active subscriber/client connection
-                # for broadcasting. Thanks to Jonas Hagstedt
+                # Use the first active subscriber/client connection for broadcasting.
                 for s in subscribers:
                     s.render_now()
         elif msg.kind == 'disconnect':
@@ -515,6 +514,28 @@ class UpdatePassword(BaseHandler):
             self.write(json.dumps({'success': 'Password Updated!'}))
 
 
+class initOTRHandler(BaseHandler):
+
+    '''initOTR initializes the OTR connection'''
+    def post(self):
+        username = self.current_user.decode("utf-8")
+        userpair = self.get_argument("users")
+        partner = self.get_argument("partner")
+        my_key = self.get_argument("sent_key")
+
+        redis_server.set("key-" + userpair + "-" + username, my_key)
+        redis_server.ltrim("otr-messages-" + userpair, 1, 0)
+
+        partner_key = redis_server.get("key-" + userpair + "-" + partner)
+
+        if partner_key:
+            redis_server.delete("otr-messages-" + userpair)
+            redis_server.delete("key-" + userpair + "-" + partner)
+
+        self.write(json.dumps({'partner_key': partner_key}))
+
+
+
 class OtrNewChat(BaseHandler):
 
     '''OtrNewChat allows user at home.html to type in a user and chat with them'''
@@ -567,6 +588,7 @@ class OtrChatHandler(BaseHandler):
                     username=username, 
                     messages=append_messages_otr(users),
                     users=users,
+                    partner=partner,
                     room=None)
 
     @tornado.web.authenticated
@@ -587,6 +609,7 @@ def make_app():
     app = Application([
         url(r"/", StartHandler),
         url(r"/chat", ChatHandler),
+        url(r"/initOTR", initOTRHandler),
         url(r"/otrchat", OtrChatHandler),
         url(r"/otrnew", OtrNewChat),
         url(r"/home", HomeHandler),

@@ -1,4 +1,5 @@
 var session_password = false;
+var private_key = false;
 
 function imgError(image) {
     image.onerror = "";
@@ -8,6 +9,7 @@ function imgError(image) {
 
 var is_img = new RegExp("((?:(?:https?|ftp|file)://|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#/%=~_|$]+.(jpg|png|gif|jpeg|bmp))(?!([^<]+)?>)" , "i");
 var is_link = new RegExp("https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_+.~#?&//=]*)" , "i");
+
 
 $(document).ready(function() {
 
@@ -23,6 +25,49 @@ $(document).ready(function() {
 		}
 	});
 
+	function generate_key() {
+		var g = 433;
+		var n = 55;
+
+		if (private_key == false) {		
+			// set my private key
+			private_key = Math.floor(Math.random()*50);
+		}
+
+		console.log("My private key: " + private_key);
+		// sent an un reversible version of my private key to server
+		var sent_key = Math.pow(g, private_key, n)
+		console.log("Key sent to server: " + sent_key);
+		var partner = getUrlVars()["user"];
+
+		$.ajax({
+			type: "POST",
+			dataType: "JSON",
+			url: "/initOTR",
+			data: {sent_key: sent_key, users: usersort, partner: partner},
+			success: function(data) {
+				// get the unreversible version of my partner's key
+				var received_key = data.partner_key;
+				console.log("Key received from server: " + received_key);
+
+				if (received_key == null) {
+					setTimeout(generate_key, 3000);
+				} else {
+					// set the session key by combining my secret key with the recieved key
+					var session_key = Math.pow(received_key, private_key)%n;
+					console.log("Session key: " + session_key);
+
+					sessionStorage.setItem("session_password", session_key);
+					session_password = sessionStorage.getItem("session_password");
+					decrypt_messages();
+					$("#loading").hide();
+					$("#chat, #nav").show();
+					$("#chat_input").focus();
+				}
+			}
+		});
+	}
+
 	function decrypt_message(message) {
 		var encrypted_content = message;
 		var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, session_password));
@@ -37,7 +82,7 @@ $(document).ready(function() {
 				return msg_data;
 			}
 		} else {
-			vex_prompt();
+			$("#loading").show();
 			return false;
 		}	
 	}
@@ -78,28 +123,28 @@ $(document).ready(function() {
             });
 	}
 
-	//prompt user for encryption password
-	function vex_prompt() {
-		sessionStorage.removeItem("session_password");
-		$("#chat, #nav").hide();
-		vex.dialog.alert({
-	  		message: 'Please enter your encryption key',
-	 		placeholder: '',
-	  		showCloseButton: false,
-	  		overlayClosesOnClick: false,
-	  		callback: function(value) {
-	  			if (value == "") {
-			  		window.location.href = "/home";
-				} else {
-					sessionStorage.setItem("session_password", value);
-					session_password = sessionStorage.getItem("session_password");
-					decrypt_messages();
-					$("#chat, #nav").show();
-					$("#chat_input").focus();
-				}
-	 		}
-		});
-	}
+	// //prompt user for encryption password
+	// function vex_prompt() {
+	// 	sessionStorage.removeItem("session_password");
+	// 	$("#chat, #nav").hide();
+	// 	vex.dialog.prompt({
+	//   		message: 'Please enter your encryption key',
+	//  		placeholder: '',
+	//   		showCloseButton: false,
+	//   		overlayClosesOnClick: false,
+	//   		callback: function(value) {
+	//   			if (value == "") {
+	// 		  		window.location.href = "/home";
+	// 			} else {
+	// 				sessionStorage.setItem("session_password", value);
+	// 				session_password = sessionStorage.getItem("session_password");
+	// 				decrypt_messages();
+	// 				$("#chat, #nav").show();
+	// 				$("#chat_input").focus();
+	// 			}
+	//  		}
+	// 	});
+	// }
 
 	//load messages on page load into chat area
 	setTimeout(load_messages, 0);
@@ -112,8 +157,9 @@ $(document).ready(function() {
 	session_password = sessionStorage.getItem("session_password");
 
 	if (!session_password) {
-		vex_prompt();
+		generate_key();
 	} else {
+		$("#loading").hide();
 		$("#chat, #nav").show();
 		decrypt_messages();
 	}
@@ -159,23 +205,23 @@ $(document).ready(function() {
 		}
 	});
 
-	//when delete messages is clicked, do the following
-	$("#delete_messages").click(function() {
-		vex.dialog.confirm({
-			message: 'Are you sure you want to delete the messages?',
-			callback: function(value) {
-				if (value == true) {
-					$.ajax({
-			            type: "POST",
-			            url: "/deletemessages",
-			            data: {users: usersort},
-			            success: function(){
-				            $("#messages").html("");
-			            	}
-			            });
-					return false;
-				}
-			}
-		});		
-	});
+	// //when delete messages is clicked, do the following
+	// $("#delete_messages").click(function() {
+	// 	vex.dialog.confirm({
+	// 		message: 'Are you sure you want to delete the messages?',
+	// 		callback: function(value) {
+	// 			if (value == true) {
+	// 				$.ajax({
+	// 		            type: "POST",
+	// 		            url: "/deletemessages",
+	// 		            data: {users: usersort},
+	// 		            success: function(){
+	// 			            $("#messages").html("");
+	// 		            	}
+	// 		            });
+	// 				return false;
+	// 			}
+	// 		}
+	// 	});		
+	// });
 });
