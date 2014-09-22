@@ -1,13 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
 		<div id="start_container">
-			<div id="title">Encryp.Us</div>
+			<h1><i class="icon ion-ios7-locked-outline" style="padding-bottom: 28px;"></i> Encryp.Us</h1>
 			{% if username %}
-				<div id="start_title">Welcome back, {{ username }}</div>
+				<h2>Welcome back, {{ username }}</h2>
 				<div id="login_create"><a href="/joinchat">Join chat</a></div>
 			{% else %}
-				<div id="start_title">Welcome to Encryp.Us</div>
+				<h2>Welcome to Encryp.Us</h2>
 				<div id="login_create"><a href="/login">Login or Create an Account</a></div>
 			{% end %}
+		</div>
+		<div id="about">
+				<h2>Encryp.us is a web chat application built with privacy in mind. *</h2>
+
+				<ul>
+					<li class="icon ion-locked">
+						Encryp.us uses several different encryption techniques ensuring that your communication cannot be read.
+					</li>
+					<li class="icon ion-locked">
+						For group chats all messages are encrypted with AES with a session stored password only known to your browser, and never known by the server or those spying on your connection. 
+					</li>
+					<li class="icon ion-locked">
+						For one to one chat, all messages are encrypted using an AES cipher. There is also no need for a key to be exchanged via unsecure lines of communication. A key is automatically generated based on the <a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">Diffie-Hellman exchange</a>.
+					</li>
+					<li class="icon ion-locked">
+						All passwords are salted and hashed on the server.
+					</li>
+					<li class="icon ion-locked">
+						Encryp.us protects users by using <a href="https://en.wikipedia.org/wiki/Transport_Layer_Security">SSL / TLS</a>, ensuring encrypted communication between server and client.
+					</li>
+				</ul>
+				<div id="get_started"><a href="/login">Get Started</a></div>
+		</div>
+		<div id="built_with">
+			<h2>Built with</h2>
+			<a href="https://www.python.org/"><img src="{{ static_url('images/python_logo.png') }}"></a>
+			<a href="http://redis.io/"><img src="{{ static_url('images/redis_logo.png') }}"></a>
+			<a href="http://www.tornadoweb.org"><img src="{{ static_url('images/tornado_logo.png') }}"></a>
+		</div>
+		<div id="footer">
+			&copy; Encryp.us 2014 by <a href="http://mpn.xyz">Michael Navarro</a><br><br>
+			* Encryp.us is still under developement and should only be used if you are interested in <a href="https://github.com/m-n-/encryp.us">contributing to its development</a>. There are plenty of existing tools that currently do a much better job and have been rigourously tested by legitimate cryptographers and security experts.
 		</div>
 {% end %}

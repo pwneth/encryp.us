@@ -11,6 +11,22 @@ body {
 	background: url("bg.png");
 }
 
+h1 {
+	font-weight: 400;
+	font-family: "Geo",sans-serif;
+	font-size: 150px;
+	text-shadow: 4px 4px 0px rgba(255, 255, 255, 0.5);
+	margin: 10px 0px;
+}
+
+h2 {
+	font-weight: 400;
+	font-family: "Geo",sans-serif;
+	font-size: 75px;
+	margin: 10px 0px 50px 0px;
+	text-shadow: 4px 4px 0px rgba(0, 0, 255, 0.3);
+}
+
 ::-webkit-input-placeholder { color:blue; opacity: 1;}
 ::-moz-placeholder { color:blue; opacity: 1; } /* firefox 19+ */
 :-ms-input-placeholder { color:blue; opacity: 1; } /* ie */
@@ -56,6 +72,79 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	float: left;
 	background: blue;
 	text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
+}
+
+#about {
+	text-align: center;
+	background: rgba(255,255,255,.8);
+	padding: 100px 50px;
+	margin: 50px 0;
+	color: blue;
+}
+
+#about ul {
+	margin-bottom: 50px;
+	width: 800px;
+	margin: 0 auto 50px auto;
+}
+
+#about ul li {
+	text-align: left;
+	list-style: none;
+	font-family: 'Glegoo', serif;
+	font-size: 20px;
+	padding-bottom: 20px;
+	text-indent: -18px;
+}
+
+#about ul li:before {
+	padding-right: 10px;
+}
+
+#about ul li a {
+	color: blue;
+}
+
+#built_with {
+	text-align: center;
+	background: rgba(255,255,255,.8);
+	padding: 25px 0px 40px 0px;
+	color: blue;
+	margin: 50px 0;
+}
+
+#built_with h2 {
+	margin-bottom: 30px;
+}
+
+#built_with img {
+	/*box-shadow: 1px 1px 4px 4px rgba(0, 0, 255, 0.5);*/
+}
+
+#built_with img:hover {
+	background: #fff;
+	border-radius: 100px;
+}
+
+#built_with a {
+	margin-right: 50px;
+}
+
+#built_with a:last-child {
+	margin-right: 0px;
+}
+
+#footer {
+	text-align: center;
+	background: blue;
+	color: #fff;
+	font-size: 25px;
+	padding: 50px;
+	font-family: "Geo",sans-serif;
+}
+
+#footer a {
+	color: #fff;
 }
 
 /* otr styles  */
@@ -283,9 +372,35 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 #login_create a{
+	font-family: 'Glegoo', serif;
 	color: #fff;
-	font-size: 25px;
+	font-size: 20px;
+	text-decoration: none;
+	background: blue;
+	border: 3px solid #fff;
+	padding: 10px 20px;
+}
 
+#login_create a:hover{
+	color: blue;
+	font-weight: 700;
+	background: #fff;
+}
+
+#get_started a{
+	font-family: 'Glegoo', serif;
+	color: blue;
+	font-size: 20px;
+	text-decoration: none;
+	border: 3px solid blue;
+	padding: 10px 20px;
+	margin-top: 20px;
+}
+
+#get_started a:hover{
+	color: #fff;
+	font-weight: 700;
+	background: blue;
 }
 
 #title {
