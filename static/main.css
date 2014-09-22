@@ -15,7 +15,7 @@ h1 {
 	font-weight: 400;
 	font-family: "Geo",sans-serif;
 	font-size: 150px;
-	text-shadow: 4px 4px 0px rgba(255, 255, 255, 0.5);
+	text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
 	margin: 10px 0px;
 }
 
@@ -24,7 +24,7 @@ h2 {
 	font-family: "Geo",sans-serif;
 	font-size: 75px;
 	margin: 10px 0px 50px 0px;
-	text-shadow: 4px 4px 0px rgba(0, 0, 255, 0.3);
+	text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
 }
 
 ::-webkit-input-placeholder { color:blue; opacity: 1;}
@@ -71,7 +71,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 #home {
 	float: left;
 	background: blue;
-	text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
+	text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
 }
 
 #about {
@@ -80,6 +80,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	padding: 100px 50px;
 	margin: 50px 0;
 	color: blue;
+	border-top: 10px solid blue;
 }
 
 #about ul {
@@ -368,7 +369,6 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	background: blue;
 	padding: 100px 0;
 	color: #fff;
-	border-bottom: 1px solid blue;
 }
 
 #login_create a{
@@ -379,6 +379,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	background: blue;
 	border: 3px solid #fff;
 	padding: 10px 20px;
+	box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.2);
 }
 
 #login_create a:hover{
@@ -395,6 +396,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	border: 3px solid blue;
 	padding: 10px 20px;
 	margin-top: 20px;
+	box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.2);
 }
 
 #get_started a:hover{
