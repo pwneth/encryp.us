@@ -77,10 +77,14 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 #about {
 	text-align: center;
 	background: rgba(255,255,255,.8);
-	padding: 100px 50px;
+	padding: 50px 50px 100px 50px;
 	margin: 50px 0;
 	color: blue;
-	border-top: 10px solid blue;
+}
+
+#about h2 {
+	margin: 50px auto;
+	max-width: 1200px;
 }
 
 #about ul {
@@ -120,11 +124,6 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 
 #built_with img {
 	/*box-shadow: 1px 1px 4px 4px rgba(0, 0, 255, 0.5);*/
-}
-
-#built_with img:hover {
-	background: #fff;
-	border-radius: 100px;
 }
 
 #built_with a {
@@ -384,7 +383,6 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 
 #login_create a:hover{
 	color: blue;
-	font-weight: 700;
 	background: #fff;
 }
 
@@ -401,7 +399,6 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 
 #get_started a:hover{
 	color: #fff;
-	font-weight: 700;
 	background: blue;
 }
 
