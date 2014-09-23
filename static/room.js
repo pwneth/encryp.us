@@ -302,14 +302,27 @@ $(document).ready(function() {
 
 	//shows user list
 	$("#del_user").click(function() {
-		if ($("#users").is(":visible")) {
-	    	$("#users").hide();
-	    	$("#add_user").hide();
-			$("#messages").css("width", "100%");
-		} else {	
-			$("#messages").css("width", "70%");
-			$("#users").show();
-			$("#add_user").show();
-	    } 
+
+		if (window.outerWidth > 480) {
+			if ($("#users").is(":visible")) {
+		    	$("#users").hide();
+		    	$("#add_user").hide();
+				$("#messages").css("width", "100%");
+			} else {	
+				$("#messages").css("width", "70%");
+				$("#users").show();
+				$("#add_user").show();
+		    } 
+		} else {
+			if ($("#users").is(":visible")) {
+		    	$("#users").hide();
+		    	$("#add_user").hide();
+				$("#messages").show();
+			} else {	
+				$("#messages").hide();
+				$("#users").show().css("width", "100%");
+				$("#add_user").show();
+		    } 
+		}
 	});
 });

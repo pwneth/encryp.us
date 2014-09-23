@@ -41,13 +41,13 @@
 				<li><a href="https://github.com/m-n-/encryp.us">github</a></li>
 				{% end %}
 				{% if username %}
-				<li><a href="/logout">logout</a></li>
-				<li><a href="/home">home</a></li>
+				<li class="mobile_hide"><a href="/logout">logout</a></li>
+				<li class="mobile_hide"><a href="/home">home</a></li>
 				{% end %}
 				{% if room %}
 				<li id="del_user"><a>users</a></li>
 				{% if admin %}
-				<li id="delete_messages"><a>delete messages</a></li>
+				<li class="mobile_hide" id="delete_messages"><a>delete messages</a></li>
 				{% end %}
 				{% end %}
 			</ul>
