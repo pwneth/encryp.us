@@ -1,10 +1,15 @@
-Encrypted Chat with Python Tornado and Redis
-=
+Encryp.us > https://encryp.us
+====================
 
-Nice to haves:
---------------
- - emoji
- - add sounds
+About:
+------
+ - Encryp.us is an open-source web chat application built with privacy as a priority. *
+ - Encryp.us uses several different encryption techniques ensuring that your communication cannot be read.
+ - For group chats all messages are encrypted with AES with a session stored password only known to your browser, and never known by the server or those spying on your connection.
+ - For one to one chat, all messages are encrypted using an AES cipher. There is also no need for a key to be exchanged via unsecure lines of communication. A key is automatically generated based on the Diffie-Hellman exchange.
+ - All passwords are salted and hashed on the server.
+ - Encryp.us protects users by using SSL / TLS, ensuring encrypted communication between server and client.
+ - Clone the project and upload to your own server as you wish!
 
 Planned Enhancements:
 ----------
@@ -15,17 +20,24 @@ Planned Enhancements:
    validated
  - change routing of urls
  - add otr with user to user chat
+ - emoji
+ - notifications, sounds, favicon.js
 
-Necessary:
-----------
- - ssl
- - nginx
- - docker?
+Interested in Contributing?
+-----------------
+ - email me @ m.n@mailbox.org
+ - or just submit and pull request :)
 
-Bugs:
------
- - chrome window.pathname
- - messages not sending when live - memory issue?
+License:
+---------
+The MIT License (MIT)
+Copyright (c) 2014 Michael Navarro
+
+Stack:
+------
+ - Tornado Web Server
+ - Redis Database
+ - Nginx
   
 Requirements:
 -------------
