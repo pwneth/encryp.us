@@ -41,8 +41,13 @@
 				<li><a href="https://github.com/m-n-/encryp.us">github</a></li>
 				{% end %}
 				{% if username %}
+
+				{% if title == "Home" %}
+				<li><a href="/logout">logout</a></li>
+				{% else %}
 				<li class="mobile_hide"><a href="/logout">logout</a></li>
 				<li class="mobile_hide"><a href="/home">home</a></li>
+				{% end %}
 				{% end %}
 				{% if room %}
 				<li id="del_user"><a>users</a></li>

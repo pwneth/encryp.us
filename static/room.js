@@ -17,14 +17,16 @@ $(document).ready(function() {
 
 	var messageDiv = document.getElementById("messages");
 
-	$(window).on('mousemove', function (e) {
-		if (e.pageY <= 10) {
-			$('#nav').slideDown('fast');
-		}
-		if (e.pageY >= 61) {
-			$('#nav').slideUp('fast');
-		}
-	});
+	if (window.innerWidth > 480) {
+		$(window).on('mousemove', function (e) {
+			if (e.pageY <= 10) {
+				$('#nav').slideDown('fast');
+			}
+			if (e.pageY >= 61) {
+				$('#nav').slideUp('fast');
+			}
+		});
+	}
 
 	//decrypt all messages function
 	function decrypt_messages() {

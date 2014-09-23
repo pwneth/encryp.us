@@ -16,14 +16,16 @@ $(document).ready(function() {
 	var usersort = $("#users_txt").text();
 	var messageDiv = document.getElementById("messages");
 
-	$(window).on('mousemove', function (e) {
-		if (e.pageY <= 10) {
-			$('#nav').slideDown('fast');
-		}
-		if (e.pageY >= 61) {
-			$('#nav').slideUp('fast');
-		}
-	});
+	if (window.innerWidth > 480) {
+		$(window).on('mousemove', function (e) {
+			if (e.pageY <= 10) {
+				$('#nav').slideDown('fast');
+			}
+			if (e.pageY >= 61) {
+				$('#nav').slideUp('fast');
+			}
+		});
+	}
 
 	function generate_key() {
 		var g = 433;
