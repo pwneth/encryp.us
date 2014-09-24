@@ -413,7 +413,6 @@ class UserHandler(BaseHandler):
 class LoginHandler(BaseHandler):
 
     '''This handler shows the login page if user is not logged in'''
-
     def get(self):
         next_page = self.get_argument("next", default="/")
         if self.current_user:

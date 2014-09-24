@@ -72,6 +72,19 @@ $(document).ready(function() {
 			 		}
 				});
 				return false;
+			} else if (xhr.status == 403) {
+				$("#chat").hide();
+				$("#nav").hide();
+				vex.dialog.alert({
+			  		message: 'You have logged out',
+			  		showCloseButton: false,
+			  		overlayClosesOnClick: false,
+			  		callback: function() {
+			  			window.location.href = "/login";
+						$("body").hide();
+			 		}
+				});
+				return false;
 			} else {
 				decrypt_messages();
 				setTimeout(load_messages, 0);
