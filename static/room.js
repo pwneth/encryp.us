@@ -7,6 +7,7 @@ function imgError(image) {
 }
 
 var is_img = new RegExp("((?:(?:https?|ftp|file)://|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#/%=~_|$]+.(jpg|png|gif|jpeg|bmp))(?!([^<]+)?>)" , "i");
+var is_link = new RegExp("https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_+.~#?&//=]*)" , "i");
 
 //check if scroll bar and scroll down if
 $.fn.hasScrollBar = function() {
@@ -28,69 +29,69 @@ $(document).ready(function() {
 		});
 	}
 
-	//decrypt all messages function
-	function decrypt_messages() {
-		$(".msg").each(function( index ) {
-			var encrypted_content = $(this).data("msg");
-			var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, session_password));
-			if (decrypted_content.substr(0,session_password.length) == session_password) {
-				var msg_data = decrypted_content.substr(session_password.length);
-				if (msg_data.match(is_img)) {
-					$(this).html("<a href=\"" + msg_data + "\"><img class=\"chat_img\" onerror=\"imgError(this);\" src=\"" + msg_data + "\"></a>");
-				} else {
-					$(this).text(msg_data).linkify();
-				}
-				if ($("#messages").hasScrollBar()) {
-					messageDiv.scrollTop = messageDiv.scrollHeight;
-				} else {
-					$("#messages_inner").css({
-						top: "auto",
-						bottom: 0
-					});
-				}
-			} else {
-				vex_prompt();
-				return false;
-			}
-		});
-	}
+	// //decrypt all messages function
+	// function decrypt_messages() {
+	// 	$(".msg").each(function( index ) {
+	// 		var encrypted_content = $(this).data("msg");
+	// 		var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, session_password));
+	// 		if (decrypted_content.substr(0,session_password.length) == session_password) {
+	// 			var msg_data = decrypted_content.substr(session_password.length);
+	// 			if (msg_data.match(is_img)) {
+	// 				$(this).html("<a href=\"" + msg_data + "\"><img class=\"chat_img\" onerror=\"imgError(this);\" src=\"" + msg_data + "\"></a>");
+	// 			} else {
+	// 				$(this).text(msg_data).linkify();
+	// 			}
+	// 			if ($("#messages").hasScrollBar()) {
+	// 				messageDiv.scrollTop = messageDiv.scrollHeight;
+	// 			} else {
+	// 				$("#messages_inner").css({
+	// 					top: "auto",
+	// 					bottom: 0
+	// 				});
+	// 			}
+	// 		} else {
+	// 			vex_prompt();
+	// 			return false;
+	// 		}
+	// 	});
+	// }
 
-	//load messages into messages divs
-	function load_messages(){
-		session_room = sessionStorage.getItem("session_room");
-		$("#messages").load("/message #messages_inner", {room: session_room}, function(response, status, xhr) {
-			if (xhr.status == 401) {
-				$("#chat").hide();
-				$("#nav").hide();
-				vex.dialog.alert({
-			  		message: 'You have been booted from ' + session_room,
-			  		showCloseButton: false,
-			  		overlayClosesOnClick: false,
-			  		callback: function() {
-			  			window.location.href = "/home";
-						$("body").hide();
-			 		}
-				});
-				return false;
-			} else if (xhr.status == 403) {
-				$("#chat").hide();
-				$("#nav").hide();
-				vex.dialog.alert({
-			  		message: 'You have logged out',
-			  		showCloseButton: false,
-			  		overlayClosesOnClick: false,
-			  		callback: function() {
-			  			window.location.href = "/login";
-						$("body").hide();
-			 		}
-				});
-				return false;
-			} else {
-				decrypt_messages();
-				setTimeout(load_messages, 0);
-			}
-		});
-	}
+	// //load messages into messages divs
+	// function load_messages(){
+	// 	session_room = sessionStorage.getItem("session_room");
+	// 	$("#messages").load("/message #messages_inner", {room: session_room}, function(response, status, xhr) {
+	// 		if (xhr.status == 401) {
+	// 			$("#chat").hide();
+	// 			$("#nav").hide();
+	// 			vex.dialog.alert({
+	// 		  		message: 'You have been booted from ' + session_room,
+	// 		  		showCloseButton: false,
+	// 		  		overlayClosesOnClick: false,
+	// 		  		callback: function() {
+	// 		  			window.location.href = "/home";
+	// 					$("body").hide();
+	// 		 		}
+	// 			});
+	// 			return false;
+	// 		} else if (xhr.status == 403) {
+	// 			$("#chat").hide();
+	// 			$("#nav").hide();
+	// 			vex.dialog.alert({
+	// 		  		message: 'You have logged out',
+	// 		  		showCloseButton: false,
+	// 		  		overlayClosesOnClick: false,
+	// 		  		callback: function() {
+	// 		  			window.location.href = "/login";
+	// 					$("body").hide();
+	// 		 		}
+	// 			});
+	// 			return false;
+	// 		} else {
+	// 			decrypt_messages();
+	// 			setTimeout(load_messages, 0);
+	// 		}
+	// 	});
+	// }
 
 	//prompt user for encryption password
 	function vex_prompt() {
@@ -114,6 +115,110 @@ $(document).ready(function() {
 	 		}
 		});
 	}
+
+	function decrypt_message(message) {
+		var encrypted_content = message;
+		var decrypted_content = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(encrypted_content, session_password));
+		
+		if (decrypted_content.substr(0,session_password.length) == session_password) {
+			var msg_data = decrypted_content.substr(session_password.length);
+			if (msg_data.match(is_img)) {
+				return "<a href=\"" + msg_data + "\"><img class=\"chat_img\" onerror=\"imgError(this);\" src=\"" + msg_data + "\"></a>";
+			} else if (msg_data.match(is_link)) {
+				return "<a href=\"" + msg_data + "\">" + msg_data + "</a>";
+			} else {
+				return msg_data;
+			}
+		} else {
+			$("#loading").show();
+			return false;
+		}	
+	}
+
+	//decrypt all messages function
+	function decrypt_messages() {
+		$(".msg").each(function( index ) {
+			$(this).html(decrypt_message($(this).text()));
+		});
+	}
+
+	//load messages into messages divs
+	function load_messages(){
+		var xhReq = jQuery.ajaxSetup( {}, {}).xhr(),
+			readPos = 0,
+			timer;
+
+
+		xhReq.onreadystatechange = function(){	
+			if (xhReq.readyState !== 4) return;
+				clearInterval(timer);
+			if (xhReq.status == 401) {
+				console.log("401 error!!!");
+				$("#chat").hide();
+				$("#nav").hide();
+				vex.dialog.alert({
+			  		message: 'You have been booted from ' + session_room,
+			  		showCloseButton: false,
+			  		overlayClosesOnClick: false,
+			  		callback: function() {
+			  			window.location.href = "/home";
+						$("body").hide();
+			 		}
+				});
+				return false;
+			} else if (xhReq.status == 403) {
+				$("#chat").hide();
+				$("#nav").hide();
+				vex.dialog.alert({
+			  		message: 'You have logged out',
+			  		showCloseButton: false,
+			  		overlayClosesOnClick: false,
+			  		callback: function() {
+			  			window.location.href = "/login";
+						$("body").hide();
+			 		}
+				});
+				return false;
+			} else {
+					setTimeout(load_messages, 0);
+				}
+			};
+
+		function readData(){
+			var new_data = xhReq.responseText.slice(readPos),
+				data,
+				html_message = "",
+				classname = "";
+
+			if (!new_data) return;
+
+			console.log(new_data);
+
+			readPos += new_data.length;
+			data = jQuery.parseJSON(new_data);
+
+        	if (data.username != data.message.name) {
+        		classname = "notme";
+        	}
+        	html_message = "<div class=\"message\"><div class=\"name " + classname + "\">" + data.message.name + "</div><div class=\"msg\">" + decrypt_message(data.message.message) + "</div><div class=\"time\">" + data.message.time + "</div></div>";
+        	$("#messages_inner").append(html_message);
+			if ($("#messages").hasScrollBar()) {
+				messageDiv.scrollTop = messageDiv.scrollHeight;
+			} else {
+				$("#messages_inner").css({
+					top: "auto",
+					bottom: 0
+				});
+			}
+		}
+
+		xhReq.open("POST", "/message", true);
+		xhReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+		xhReq.send("room=" + session_room);
+
+		timer = setInterval(readData, 100);
+	}
+
 
 	//when user_del is clicked delete the user and do the following
 	function refresh_delete_user_click_event(selector) {

@@ -193,21 +193,29 @@ class MessageHandler(BaseHandler):
             subscriber.subscribe("new-messages-" + self.room, self)
 
     def render_now(self,close=False):
-        admin = is_admin(self.current_user.decode("utf-8"), self.room)
+        # admin = is_admin(self.current_user.decode("utf-8"), self.room)
+        username = self.current_user.decode("utf-8")
+        message_data = redis_server.lrange("chat-messages-" + self.room, "0", "-1")
         logging.debug("rendering now {0}".format(self.room))
-        users = user_list(self.room)
-        requests = req_list(self.room)
-        self.render("room.html", 
-                    title="Home Page",
-                    username=self.current_user.decode("utf-8"), 
-                    messages=append_messages(self.room), 
-                    admin=admin, 
-                    room=self.room, 
-                    error=None,
-                    users=users,
-                    requests=requests)
-        if not close:
-            subscriber.unsubscribe("new-messages-" + self.room, self)
+
+        if not is_allowed_in_chat(self.current_user.decode("utf-8"), self.room):
+            self.finish()
+        else:
+            self.write(json.dumps({'message': json.loads(message_data[-1]), 'username':username}))
+            self.flush()
+        # users = user_list(self.room)
+        # requests = req_list(self.room)
+        # self.render("room.html", 
+        #             title="Home Page",
+        #             username=self.current_user.decode("utf-8"), 
+        #             messages=append_messages(self.room), 
+        #             admin=admin, 
+        #             room=self.room, 
+        #             error=None,
+        #             users=users,
+        #             requests=requests)
+        # if not close:
+        #     subscriber.unsubscribe("new-messages-" + self.room, self)
 
 
 class DeleteMessagesHandler(BaseHandler):
