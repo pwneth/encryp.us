@@ -558,18 +558,24 @@ class OtrMessageHandler(BaseHandler):
     @tornado.web.authenticated
     @tornado.web.asynchronous
     def post(self):
+        # self.counter = 0
         self.users = self.get_argument("users")
         logging.debug("listening to {0}".format(self.users))
         subscriber.subscribe("new-otr-messages-" + self.users, self)
 
-    def render_now(self,close=False):
+    def render_now(self, close=False):
         username = self.current_user.decode("utf-8")
         message_data = redis_server.lrange("otr-messages-" + self.users, "0", "-1")
         logging.debug("rendering now {0}".format(self.users))
         self.write(json.dumps({'message': json.loads(message_data[-1]), 'username':username}))
-        self.finish()
-        if not close:
-            subscriber.unsubscribe("new-otr-messages-" + self.users, self)
+        self.flush()
+
+        # self.counter += 1
+        # if close:
+        #     self.finish()
+        # elif self.counter > 50:
+        #     self.finish()
+        #     subscriber.unsubscribe("new-otr-messages-" + self.users, self)
 
 
 class OtrChatHandler(BaseHandler):

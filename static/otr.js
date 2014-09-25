@@ -98,31 +98,54 @@ $(document).ready(function() {
 
 	//load messages into messages divs
 	function load_messages(){
-		$.ajax({
-			type: "POST",
-            dataType: "json",
-            url: "/otrmessage",
-            data: {users: usersort},
-            success: function(data){
-                	console.log(data);
-                	var html_message = "";
-                	var classname = "";
-                	if (data.username != data.message.name) {
-                		classname = "notme";
-                	}
-                	html_message = "<div class=\"message\"><div class=\"name " + classname + "\">" + data.message.name + "</div><div class=\"msg\">" + decrypt_message(data.message.message) + "</div><div class=\"time\">" + data.message.time + "</div></div>";
-                	$("#messages_inner").append(html_message);
-					if ($("#messages").hasScrollBar()) {
-						messageDiv.scrollTop = messageDiv.scrollHeight;
-					} else {
-						$("#messages_inner").css({
-							top: "auto",
-							bottom: 0
-						});
-					}
-                	setTimeout(load_messages, 0);
-            	}
-            });
+		var xhReq = jQuery.ajaxSetup( {}, {}).xhr(),
+			readPos = 0,
+			timer;
+
+
+		xhReq.onreadystatechange = function(){
+				if (xhReq.readyState !== 4) return;
+				clearInterval(timer);
+				if (xhReq.status === 403) {
+					window.location.pathname = "/logout";
+				} else {
+					setTimeout(load_messages, 0);
+				}
+			};
+
+		function readData(){
+			var new_data = xhReq.responseText.slice(readPos),
+				data,
+				html_message = "",
+				classname = "";
+
+			if (!new_data) return;
+
+			console.log(new_data);
+
+			readPos += new_data.length;
+			data = jQuery.parseJSON(new_data);
+
+        	if (data.username != data.message.name) {
+        		classname = "notme";
+        	}
+        	html_message = "<div class=\"message\"><div class=\"name " + classname + "\">" + data.message.name + "</div><div class=\"msg\">" + decrypt_message(data.message.message) + "</div><div class=\"time\">" + data.message.time + "</div></div>";
+        	$("#messages_inner").append(html_message);
+			if ($("#messages").hasScrollBar()) {
+				messageDiv.scrollTop = messageDiv.scrollHeight;
+			} else {
+				$("#messages_inner").css({
+					top: "auto",
+					bottom: 0
+				});
+			}
+		}
+
+		xhReq.open("POST", "/otrmessage", true);
+		xhReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+		xhReq.send("users=" + usersort);
+
+		timer = setInterval(readData, 100);
 	}
 
 	// //prompt user for encryption password
