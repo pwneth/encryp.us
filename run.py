@@ -226,7 +226,12 @@ class DeleteMessagesHandler(BaseHandler):
     def post(self):
         room = self.get_argument("room")
         redis_server.ltrim("chat-messages-" + room, 1, 0)
-        redis_server.publish("new-messages-" + room, "messages deleted")
+        # time = datetime.now().strftime("%-I:%M %p")
+        # json_message = json.dumps({'name':self.current_user.decode("utf-8"), 'message':'messages deleted!', 'time':time})
+        # redis_server.rpush("chat-messages-" + room, json_message)
+        # subscriber.unsubscribe("new-messages-" + room, self)
+        # subscriber.subscribe("new-messages-" + room, self)
+        # redis_server.publish("new-messages-" + room, "messages deleted")
 
 
 class DeleteChatHandler(BaseHandler):
