@@ -8,7 +8,8 @@ html, body {
 }
 
 body {
-	background: url("bg.png");
+	/*background: url("bg.png");*/
+	background: blue;
 }
 
 h1 {
@@ -76,9 +77,9 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 
 #about {
 	text-align: center;
-	background: rgba(255,255,255,.8);
+	background: #fff;
 	padding: 50px 50px 100px 50px;
-	margin: 50px 0;
+	margin-bottom: 50px;
 	color: blue;
 }
 
@@ -112,10 +113,9 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 
 #built_with {
 	text-align: center;
-	background: rgba(255,255,255,.8);
+	background: #fff;
 	padding: 25px 0px 40px 0px;
 	color: blue;
-	margin: 50px 0;
 }
 
 #built_with h2 {
@@ -141,10 +141,17 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	font-size: 25px;
 	padding: 50px;
 	font-family: "Geo",sans-serif;
+	float:left;
 }
 
 #footer a {
 	color: #fff;
+}
+
+#content_w_footer {
+	width: 100%;
+	background: #fff;
+	float: left;
 }
 
 /* otr styles  */
@@ -211,6 +218,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
+	margin-bottom: 100px;
 }
 
 #login_form:first-child {
@@ -585,11 +593,13 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 #home_left {
 	width: 48%;
 	float: left;
+	padding-bottom: 100px;
 }
 
 #home_right {
 	width: 48%;
 	float: right;
+	padding-bottom: 100px;
 }
 
 #room_list {
@@ -723,6 +733,7 @@ input:-moz-placeholder { color:blue; opacity: 1; }
 }
 
 #chat {
+	background: #eee;
 	display: none;
 	width: 100%;
 	height: 100%;
@@ -1137,11 +1148,11 @@ input[type="submit"]:hover {
 }
 
 .vex-overlay {
-	background: url("bg.png") !important;
+	background: blue;
 }
 
 .vex-dialog-message {
-	color: blue !important;
+	color: #fff !important;
 	display: block !important;
 	width: 100% !important;
 	text-align: center !important;
@@ -1149,6 +1160,7 @@ input[type="submit"]:hover {
 	margin-bottom: 10px !important;
 	font-family: "Geo",sans-serif !important;
 	font-size: 20px !important;
+	background: blue;
 }
 
 .vex-dialog-button {
@@ -1168,12 +1180,12 @@ input[type="submit"]:hover {
 .vex-content {
 
 	border-radius: 0px !important;
-	border: 1px solid blue !important;
-	background-color: #fff !important;
+	border: 1px solid #fff !important;
+	background-color: blue !important;
 	padding: 50px !important;
-	-webkit-box-shadow: 7px 7px 0px 0px rgba(0, 0, 255, 1) !important;
-	-moz-box-shadow:    7px 7px 0px 0px rgba(0, 0, 255, 1) !important;
-	box-shadow:         7px 7px 0px 0px rgba(0, 0, 255, 1) !important;
+	-webkit-box-shadow: 7px 7px 0px 0px rgba(255, 255, 255, 1) !important;
+	-moz-box-shadow:    7px 7px 0px 0px rgba(255, 255, 255, 1) !important;
+	box-shadow:         7px 7px 0px 0px rgba(255, 255, 255, 1) !important;
 }
 
 .vex-content input[type="password"] {
@@ -1194,8 +1206,8 @@ input[type="submit"]:hover {
 	font-family: "Geo",sans-serif !important;
 	height: 3em !important;
 	font-size: 15px !important;
-	background: blue !important;
-	color: #fff !important;
+	background: #fff !important;
+	color: blue !important;
 	border-radius: 0px !important;
 }
 
@@ -1243,9 +1255,9 @@ input[type="submit"]:hover {
 
 	#login_form {
 		box-shadow: none;
-		border: 0px;
 		width: 100%;
 		margin-bottom: 50px;
+		border-width: 1px 0px 5px 0px;
 	}
 
 	#join_container {
@@ -1254,10 +1266,12 @@ input[type="submit"]:hover {
 
 	#home_left {
 		width: 100%;
+		padding-bottom: 0px;
 	}
 
 	#home_right {
 		width: 100%;
+		padding-bottom: 0px;
 	}
 
 	#nav_title {
@@ -1266,7 +1280,7 @@ input[type="submit"]:hover {
 
 	.room_container {
 		box-shadow: none;
-		border: 0px;
+		border-width: 1px 0px 5px 0px;
 	}
 
 	#nav .mobile_hide {

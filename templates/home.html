@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+	<div id="content_w_footer">
 		<div id="join_container">
 			<div id="home_left">
 				<div class="room_container">
@@ -84,4 +85,6 @@
 				</div>
 			</div>
 		</div>
+		{% module Template("footer.html") %}
+	</div>
 {% end %}
