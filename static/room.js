@@ -130,7 +130,15 @@ $(document).ready(function() {
 				return msg_data;
 			}
 		} else {
-			$("#loading").show();
+			vex.dialog.alert({
+		  		message: 'Incorrect password for ' + session_room,
+		  		showCloseButton: false,
+		  		overlayClosesOnClick: false,
+		  		callback: function() {
+		  			window.location.href = "/home";
+					$("body").hide();
+		 		}
+			});
 			return false;
 		}	
 	}
@@ -156,15 +164,6 @@ $(document).ready(function() {
 				console.log("401 error!!!");
 				$("#chat").hide();
 				$("#nav").hide();
-				vex.dialog.alert({
-			  		message: 'You have been booted from ' + session_room,
-			  		showCloseButton: false,
-			  		overlayClosesOnClick: false,
-			  		callback: function() {
-			  			window.location.href = "/home";
-						$("body").hide();
-			 		}
-				});
 				return false;
 			} else if (xhReq.status == 403) {
 				$("#chat").hide();
