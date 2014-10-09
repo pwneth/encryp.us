@@ -17,7 +17,7 @@ h1 {
 	font-family: "Geo",sans-serif;
 	font-size: 150px;
 	margin: 10px 0px;
-	text-shadow:0px 0px 0 #fff,1px 1px 0 #518f50,2px 2px 0 #fff,3px 3px 0 #518f50, 4px 4px 0 #fff,5px 5px 0px #518f50;
+	text-shadow:0px 0px 0 #fff,1px 1px 0 #518f50,2px 2px 0 #fff,3px 3px 0 #518f50;
 }
 
 h2 {
@@ -25,7 +25,7 @@ h2 {
 	font-family: "Geo",sans-serif;
 	font-size: 75px;
 	margin: 10px 0px 50px 0px;
-	text-shadow:0px 0px 0 #fff,1px 1px 0 #518f50,2px 2px 0 #fff,3px 3px 0 #518f50, 4px 4px 0 #fff,5px 5px 0px #518f50;
+	text-shadow:0px 0px 0 #fff,1px 1px 0 #518f50,2px 2px 0 #fff,3px 3px 0 #518f50;
 }
 
 ::-webkit-input-placeholder { color:#518f50; opacity: 1;}
