@@ -18,7 +18,7 @@ h1 {
 	font-family: "Geo",sans-serif;
 	font-size: 150px;
 	margin: 10px 0px;
-	text-shadow:1px 1px 0 #8C9557,2px 2px 0 #fff,3px 3px 0 #8C9557,0px 0px 10px #000,0px 0px 10px #000,0px 0px 10px #000,0px 0px 10px #000;
+	text-shadow:1px 1px 0 #8C9557,2px 2px 0 #fff,3px 3px 0 #8C9557,0px 0px 10px #1E2E22,0px 0px 10px #1E2E22,0px 0px 10px #1E2E22,0px 0px 10px #1E2E22;
 }
 
 h2 {
@@ -30,7 +30,7 @@ h2 {
 }
 
 #start_container h2 {
-	text-shadow:0px 0px 0 #fff,1px 1px 0 #8C9557,2px 2px 0 #fff,3px 3px 0 #8C9557,0px 0px 10px #000,0px 0px 10px #000,0px 0px 10px #000,0px 0px 10px #000;
+	text-shadow:0px 0px 0 #fff,1px 1px 0 #8C9557,2px 2px 0 #fff,3px 3px 0 #8C9557,0px 0px 10px #1E2E22,0px 0px 10px #1E2E22,0px 0px 10px #1E2E22,0px 0px 10px #1E2E22;
 }
 
 ::-webkit-input-placeholder { color:#8C9557; opacity: 1;}
@@ -73,6 +73,26 @@ input:-moz-placeholder { color:#8C9557; opacity: 1; }
 	list-style: none;
 }
 
+#nav_login {
+	color: #fff !important;
+	background: #8C9557;
+}
+
+#nav_login:hover {
+	border-bottom: none !important;
+}
+
+#login_popup {
+	display: none;
+	position: fixed;
+	top: 60px;
+	right: 0px;
+	width: 300px;
+	background: rgba(255,255,255,.9);
+	padding: 20px;
+	box-shadow: 0px 0px 5px 0px rgba(0,0,0,.5);
+	text-align: center;
+}
 
 #home {
 	float: left;
@@ -127,10 +147,6 @@ input:-moz-placeholder { color:#8C9557; opacity: 1; }
 
 #built_with h2 {
 	margin-bottom: 30px;
-}
-
-#built_with img {
-	/*box-shadow: 1px 1px 4px 4px rgba(0, 0, 255, 0.5);*/
 }
 
 #built_with a {
@@ -261,7 +277,7 @@ input:-moz-placeholder { color:#8C9557; opacity: 1; }
 	font-size: 15px;
 }
 
-#login_form input[type="submit"] {
+#login_form input[type="submit"], #login_popup input[type="submit"] {
 	font-family: "Geo",sans-serif;
 	font-size: 20px;
 	color: #fff;
@@ -826,13 +842,13 @@ input:-moz-placeholder { color:#8C9557; opacity: 1; }
 
 .notme {
 	color: #fff;
-	background-color: rgba(81,143,80,.6);
-	border-right: 1px solid rgba(81,143,80,.4);
-	border-bottom: 1px solid rgba(81,143,80,.4);
+	background-color: rgba(140,149,87,.6);
+	border-right: 1px solid rgba(140,149,87,.4);
+	border-bottom: 1px solid rgba(140,149,87,.4);
 }
 
 .notme:after {
-	border: 1px solid rgba(81,143,80,.7);
+	border: 1px solid rgba(140,149,87,.7);
 	border-width: 1px 0px 0px 1px;
 }
 
@@ -1186,10 +1202,10 @@ input[type="submit"]:hover {
 
 .vex-content {
 	border-radius: 0px !important;
-	border: solid 1px #8C9557 !important;
+	border: solid 5px #8C9557 !important;
 	background-color: #fff !important;
 	padding: 50px !important;
-	box-shadow: 0px -1px 0px 0px #8C9557, 0px -3px 0px -1px #8C9557, 0px -5px 0px -2px #8C9557, 0px -7px 0px -3px #8C9557, 0px -9px 0px -4px #8C9557, 0px -11px 0px -5px #8C9557, 0px -13px 0px -6px #8C9557, 0px -15px 0px -7px #8C9557 !important;
+	box-shadow: 0px 0px 10px #1E2E22 !important;
 }
 
 .vex-content input[type="password"] {

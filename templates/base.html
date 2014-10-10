@@ -16,6 +16,9 @@
 		<script src="{{ static_url("vex.combined.min.js") }}"></script>
 		<script>vex.defaultOptions.className = 'vex-theme-os';</script>
 		<script src="{{ static_url("global.js") }}"></script>
+		{% if title == "Welcome" %}
+		<script src="{{ static_url("start.js") }}"></script>
+		{% end %}
 		{% if room %}
 		<script src="{{ static_url("room.js") }}"></script>
 		{% end %}
@@ -37,8 +40,9 @@
 			<ul>
 				<li id="home"><a href="/"><i class="icon ion-ios7-locked-outline" style="font-size: 50px; line-height: 50px; padding-right: 4px;"></i></a></li>
 				{% if title == "Welcome" %}
-				<li><a href="#about">about</a></li>
+				<li><a id="nav_login">login</a></li>	
 				<li><a href="https://github.com/m-n-/encryp.us">github</a></li>
+				<li><a href="#about">about</a></li>
 				{% end %}
 				{% if username %}
 
