@@ -1,6 +1,8 @@
 Encryp.us > https://encryp.us
 ====================
 
+![Encryp.us Img](http://mpn.xyz/u/1413209116.png)
+
 About:
 ------
  - Encryp.us is an open-source web chat application built with privacy as a priority. *
