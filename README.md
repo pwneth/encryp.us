@@ -62,6 +62,6 @@ Requirements:
 ![Encryp.us Img](http://img.fae.ro/6169f6.png)
 ![Encryp.us Img](http://img.fae.ro/268f1d.png)
 ![Encryp.us Img](http://img.fae.ro/4462dc.png)
-![Encryp.us Img](http://img.fae.ro/4462dc.png)
+![Encryp.us Img](http://img.fae.ro/0bc0c7.png)
 ![Encryp.us Img](http://img.fae.ro/1aa0b4.png)
 
