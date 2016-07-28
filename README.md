@@ -1,11 +1,6 @@
-Encryp.us > https://encryp.us
+Encryp.us
 ====================
-
-![Encryp.us Img](http://img.fae.ro/6169f6.png)
-![Encryp.us Img](http://img.fae.ro/268f1d.png)
-![Encryp.us Img](http://img.fae.ro/6169f6.png)
-![Encryp.us Img](http://img.fae.ro/4462dc.png)
-![Encryp.us Img](http://img.fae.ro/1aa0b4.png)
+![Encryp.us Img](http://img.fae.ro/8c6250.png)
 
 About:
 ------
@@ -61,3 +56,12 @@ Requirements:
  - tornado-redis==2.4.18
  - torndb==0.2
  - wtforms-tornado==0.0.1
+
+ Screenshots:
+ ------------
+![Encryp.us Img](http://img.fae.ro/6169f6.png)
+![Encryp.us Img](http://img.fae.ro/268f1d.png)
+![Encryp.us Img](http://img.fae.ro/4462dc.png)
+![Encryp.us Img](http://img.fae.ro/4462dc.png)
+![Encryp.us Img](http://img.fae.ro/1aa0b4.png)
+
